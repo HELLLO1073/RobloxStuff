@@ -197,7 +197,7 @@ function UILibrary.Load(GUITitle)
 	MainFrame.Name = "MainFrame"
 	MainFrame.Size = UDim2.new(1,-50,1,-30)
 	MainFrame.Position = UDim2.new(0,25,0,15)
-	MainFrame.ImageColor3 = Color3.fromRGB(30,30,30)
+	MainFrame.ImageColor3 = Color3.fromRGB(197,43,35)		---3123
 	MainFrame.Parent = ContainerFrame
 	
 	local MenuBar, DisplayFrame, TitleBar
@@ -220,7 +220,7 @@ function UILibrary.Load(GUITitle)
 	
 	TitleBar = RoundBox(5)
 	TitleBar.Name = "TitleBar"
-	TitleBar.ImageColor3 = Color3.fromRGB(200,45,38)										--Edit
+	TitleBar.ImageColor3 = Color3.fromRGB(197,43,35)										--Edit
 	TitleBar.Size = UDim2.new(1,-10,0,20)
 	TitleBar.Position = UDim2.new(0,5,0,5)
 	TitleBar.Parent = MainFrame
@@ -670,7 +670,7 @@ function UILibrary.Load(GUITitle)
 			FlatLeft.Position = UDim2.new(1,-5,0,0)
 			FlatLeft.Parent = ToggleLeftSide
 			
-			FlatRight.BackgroundColor3 = Color3.fromRGB(200,45,38)                                                         ---5ccwe
+			FlatRight.BackgroundColor3 = Color3.fromRGB(45,45,45)                                                         
 			FlatRight.Size = UDim2.new(0,5,1,0)
 			FlatRight.Parent = ToggleRightSide
 			
