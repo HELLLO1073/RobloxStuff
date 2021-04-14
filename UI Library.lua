@@ -670,7 +670,7 @@ function UILibrary.Load(GUITitle)
 			FlatLeft.Position = UDim2.new(1,-5,0,0)
 			FlatLeft.Parent = ToggleLeftSide
 			
-			FlatRight.BackgroundColor3 = Color3.fromRGB(45,45,45)
+			FlatRight.BackgroundColor3 = Color3.fromRGB(200,45,38)                                                         ---5ccwe
 			FlatRight.Size = UDim2.new(0,5,1,0)
 			FlatRight.Parent = ToggleRightSide
 			
