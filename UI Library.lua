@@ -220,7 +220,7 @@ function UILibrary.Load(GUITitle)
 	
 	TitleBar = RoundBox(5)
 	TitleBar.Name = "TitleBar"
-	TitleBar.ImageColor3 = Color3.fromRGB(40,40,40)
+	TitleBar.ImageColor3 = Color3.fromRGB(185,0,0)										--Edit
 	TitleBar.Size = UDim2.new(1,-10,0,20)
 	TitleBar.Position = UDim2.new(0,5,0,5)
 	TitleBar.Parent = MainFrame
