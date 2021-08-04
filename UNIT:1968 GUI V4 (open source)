@@ -143,6 +143,10 @@ WorldVisaulsSec:NewDropdown("RGBGun Material", "", {"ForceField", "Glass", "Neon
     RGBgunMaterial = Mat
 end)
 
+WorldVisaulsSec:NewButton("Anti restricted area kill", "", function(cx) 
+    game:GetService("ReplicatedStorage").Events.KillMe:Destroy()
+end)
+
 local WorldVisaulsSec = WorldVisauls:NewSection("Misc")
 WorldVisaulsSec:NewToggle("Chat Spammer", "", function(b)
     chatSpammer = b
