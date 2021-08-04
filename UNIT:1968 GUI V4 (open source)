@@ -174,9 +174,7 @@ for theme, color in pairs(colors) do
 end
 
 local Credits = Window:NewTab("Credits")
-local CreditsSec = Credits:NewSection("Silent aim used: Celestial Silent Aim (UNIVERSAL)")
-local Scripts = Credits:NewSection("Most scripts made by H3LLL0/FAZED")
-local Scripts = Credits:NewSection("UI : Kavo UI Lib")
+local Scripts = Credits:NewSection("Scripts made by H3LLL0/FAZED")
 
 print("Loading 45%")
 local angle = 0
