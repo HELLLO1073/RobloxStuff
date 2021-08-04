@@ -82,7 +82,7 @@ end)
 
 
 local AATab = Window:NewTab("Anti-Aim")
-local AaSection = AATab:NewSection("Anti aim (Pitch Buggy) Spinbot works anytime")
+local AaSection = AATab:NewSection("Anti aim")
 AaSection:NewToggle("AntiAim Enabled", "", function(b)
     AntiAimEnabled = b
 end)
