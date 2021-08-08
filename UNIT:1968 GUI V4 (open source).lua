@@ -9,7 +9,7 @@ local colors =
     ElementColor = Color3.fromRGB(20, 20, 20)
 }
 
-local Window = Library.CreateLib("Unit 1968 | H3LLL0 - V:4.5", colors)
+local Window = Library.CreateLib("Unit 1968 | H3LLL0 - V:4", colors)
 --[[ 
     [THEMES]
     LightTheme
@@ -57,6 +57,7 @@ local VoiceSpamEnabled = false
 local RGBgunMaterial
 local EspBoxes = false
 local EspNames = false 
+local EspHealth = false
 local ESPEnabled = false
 local RunService = game:GetService("RunService")
 
@@ -154,7 +155,9 @@ end)
 ESPSection:NewToggle("Names", "", function(b)
     EspNames = b
 end)
-
+ESPSection:NewToggle("Health", "", function(b)
+    EspHealth = b
+end)
 local WorldVisauls = Window:NewTab("Miscellaneous")
 local WorldVisaulsSec = WorldVisauls:NewSection("Wrld Visauls")
 WorldVisaulsSec:NewToggle("FullBright/No Fog", "", function(b)
@@ -359,7 +362,7 @@ game:GetService("RunService").RenderStepped:connect(function()
                 if b then
                     if EspNames then
                     local a=Drawing.new("Text")
-                    a.Text=v.Name
+                    a.Text=v.Name .. "\n" .. v.Character.Humanoid.Health
                     a.Size=math.clamp(17-(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude,17,85)
                     a.Center=true
                     a.Outline=true
@@ -398,6 +401,72 @@ game:GetService("RunService").RenderStepped:connect(function()
                         coroutine.wrap(function()
                         game.RunService.RenderStepped:Wait()
                         a:Remove()
+                        end)()
+                    end
+                    if EspHealth then
+                        local healthnum=v.Character.Humanoid.Health
+                        local maxhealth=v.Character.Humanoid.MaxHealth
+                        local c=Drawing.new("Quad")
+                        c.Visible=true
+                        c.Color=Color3.new(0,1,0)
+                        c.Thickness=1
+                        c.Transparency=1
+                        c.Filled=false
+                        c.PointA=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).Y)-->^
+                        c.PointB=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).Y)--<^
+                        c.PointC=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).Y)--<V
+                        c.PointD=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).Y)-->V
+                        coroutine.wrap(function()
+                        game.RunService.RenderStepped:Wait()
+                            c:Remove()
+                        end)()
+                        local e=Drawing.new("Quad")
+                        e.Visible=true
+                        e.Color=Color3.new(1,0,0)
+                        e.Thickness=1
+                        e.Transparency=1
+                        e.Filled=true
+                        e.PointA=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).Y)-->^
+                        e.PointB=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).Y)--<^
+                        e.PointC=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).Y)--<V
+                        e.PointD=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).Y)-->V
+                        coroutine.wrap(function()
+                            game.RunService.RenderStepped:Wait()
+                            e:Remove()
+                        end)()
+                        local d=Drawing.new("Quad")
+                        d.Visible=true
+                        d.Color=Color3.new(0,1,0)
+                        d.Thickness=1
+                        d.Transparency=1
+                        d.Filled=true
+                        d.PointA=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).Y)-->^
+                        d.PointB=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).Y)--<^
+                        d.PointC=c.PointC--<V
+                        d.PointD=c.PointD-->V
+                        coroutine.wrap(function()
+                            game.RunService.RenderStepped:Wait()
+                            d:Remove()
                         end)()
                     end
                 end
