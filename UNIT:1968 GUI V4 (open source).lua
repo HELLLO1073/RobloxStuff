@@ -362,7 +362,7 @@ game:GetService("RunService").RenderStepped:connect(function()
                 if b then
                     if EspNames then
                     local a=Drawing.new("Text")
-                    a.Text=v.Name .. "\n" .. v.Character.Humanoid.Health
+                    a.Text=v.Name
                     a.Size=math.clamp(17-(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude,17,85)
                     a.Center=true
                     a.Outline=true
