@@ -9,7 +9,7 @@ local colors =
     ElementColor = Color3.fromRGB(20, 20, 20)
 }
 
-local Window = Library.CreateLib("Unit 1968 | H3LLL0 - V:4", colors)
+local Window = Library.CreateLib("Unit 1968 | H3LLL0 - V:4.5", colors)
 --[[ 
     [THEMES]
     LightTheme
@@ -22,7 +22,7 @@ local Window = Library.CreateLib("Unit 1968 | H3LLL0 - V:4", colors)
     Synapse
 ]]
 print("Loading 1%")
---vars
+--#vars
 local ClientPlayer = game.Players.LocalPlayer
 local Jump = 40
 local Speed = 16
@@ -52,13 +52,25 @@ local Debris = game:GetService("Debris")
 local UserInputService = game:GetService("UserInputService")
 local target = false
 local RGBgun = false
+local WhizzerEnabled = false
+local VoiceSpamEnabled = false
 local RGBgunMaterial
+local EspBoxes = false
+local EspNames = false 
+local ESPEnabled = false
 local RunService = game:GetService("RunService")
+
+
+-- functions
+local function whizzPlayer(Player, Size, Distance) 
+    game:GetService("ReplicatedStorage").Events.Whizz:FireServer(Player, Size, Distance)
+end
 getfenv().lock = "Head" -- Head or Hitbox or Random
 fov = 300
 local SAEnabled = false
 local fovCircle = false
 local st = tonumber(tick())
+
 warn("Loading script...")
 
 local SilentAimTab = Window:NewTab("Silent Aim")
@@ -95,7 +107,7 @@ end)
 AaSection:NewDropdown("Pitch", "DropdownInf", {"Down", "Straight", "Up", "Boneless", "Random"}, function(d)
     AntiAimPitch = d
 end)
-local GunTab = Window:NewTab("Weopon Mods")
+local GunTab = Window:NewTab("Weapon Mods")
 local GunSection1 = GunTab:NewSection("")
 
 local GunSection = GunTab:NewSection("Weapon Mods")
@@ -130,6 +142,19 @@ GunSection:NewToggle("Shoot through objects/walls", "", function(b)
     gunmod10 = b
 end)
 print("Loading 20%")
+local Esps = Window:NewTab("ESP")
+local ESPSection = Esps:NewSection("")
+
+ESPSection:NewToggle("ESP Enabled", "", function(b)
+    ESPEnabled = b
+end)
+ESPSection:NewToggle("Boxes", "", function(b)
+    EspBoxes = b
+end)
+ESPSection:NewToggle("Names", "", function(b)
+    EspNames = b
+end)
+
 local WorldVisauls = Window:NewTab("Miscellaneous")
 local WorldVisaulsSec = WorldVisauls:NewSection("Wrld Visauls")
 WorldVisaulsSec:NewToggle("FullBright/No Fog", "", function(b)
@@ -153,6 +178,10 @@ WorldVisaulsSec:NewToggle("Chat Spammer", "", function(b)
 end)
 WorldVisaulsSec:NewDropdown("Mode", "", {"Emoji", "Wack", "EZ", "H3LLL0", "KIDS"}, function(d)
     chatSpammerOptions = d
+end)
+
+WorldVisaulsSec:NewToggle("Whizz all", "", function(b)
+    WhizzerEnabled = b
 end)
 
 local PlayerX = Window:NewTab("Player")
@@ -179,6 +208,18 @@ end
 
 local Credits = Window:NewTab("Credits")
 local Scripts = Credits:NewSection("Scripts made by H3LLL0/FAZED")
+
+coroutine.wrap(function()
+    while wait(.09)do
+        pcall(function()
+            if WhizzerEnabled then                
+                for _,v in pairs(game.Players:GetChildren())do
+                    whizzPlayer(v, "Large", -1)                    
+                end
+            end
+        end)
+    end
+end)()
 
 print("Loading 45%")
 local angle = 0
@@ -309,7 +350,60 @@ game:GetService("RunService").RenderStepped:connect(function()
                 end
             end
         end     
-    end    
+    end 
+    if ESPEnabled then
+        for _,v in pairs(game.Players:GetPlayers()) do
+            if v.Name ~= LocalPlayer.Name and v.TeamColor ~= LocalPlayer.TeamColor then
+            local part=v.Character.HumanoidRootPart
+            local _,b=game.Workspace.CurrentCamera:WorldToViewportPoint(part.Position)
+                if b then
+                    if EspNames then
+                    local a=Drawing.new("Text")
+                    a.Text=v.Name
+                    a.Size=math.clamp(17-(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude,17,85)
+                    a.Center=true
+                    a.Outline=true
+                    a.OutlineColor=Color3.new()
+                    a.Font=Drawing.Fonts.UI
+                    a.Visible=true
+                    a.Transparency=1
+                    a.Color=Color3.new(1,1,0)
+                    a.Position=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/25)).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/25)).Y)
+                    coroutine.wrap(function()
+                        game.RunService.RenderStepped:Wait()
+                        a:Remove()
+                        end)()
+                    end
+                    if EspBoxes then
+                        local a=Drawing.new("Quad")
+                        a.Visible=true
+                        a.Color=Color3.new(1,0,0)
+                        a.Thickness=1
+                        a.Transparency=1
+                        a.Filled=false
+                        a.PointA=Vector2.new(
+                         game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*-2+part.CFrame.UpVector*2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*-2+part.CFrame.UpVector*2.5).Y)-->^
+                        a.PointB=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).Y)--<^
+                        a.PointC=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).Y)--<V
+                        a.PointD=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*-2+part.CFrame.UpVector*-2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*-2+part.CFrame.UpVector*-2.5).Y)-->V
+                        coroutine.wrap(function()
+                        game.RunService.RenderStepped:Wait()
+                        a:Remove()
+                        end)()
+                    end
+                end
+            end
+        end
+    end   
 end)
 print("Loading 60%")
 
@@ -405,5 +499,6 @@ RunService:BindToRenderStep("SilentAim",1,function()
 		end
 	end
 end)
+
 
 print("Done2")
