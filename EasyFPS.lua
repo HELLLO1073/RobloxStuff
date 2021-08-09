@@ -9,7 +9,7 @@ local colors =
     ElementColor = Color3.fromRGB(20, 20, 20)
 }
 
-local Window = Library.CreateLib("Unit 1968 | H3LLL0 - V:4", colors)
+local Window = Library.CreateLib("Too easy FPS | H3LLL0 - V:1", colors)
 --[[ 
     [THEMES]
     LightTheme
