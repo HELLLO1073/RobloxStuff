@@ -55,10 +55,13 @@ local RGBgun = false
 local WhizzerEnabled = false
 local VoiceSpamEnabled = false
 local RGBgunMaterial
+local HumParts ={ "Head","LeftHand","LeftLowerArm","LeftUpperArm","RightHand","RightLowerArm","RightUpperArm","UpperTorso","LowerTorso","RightFoot","RightLowerLeg","RightUpperLeg","LeftFoot","LeftLowerLeg","LeftUpperLeg"}
 local EspBoxes = false
 local EspNames = false 
 local EspHealth = false
 local ESPEnabled = false
+local EspChams = false
+local EspColorMain
 local RunService = game:GetService("RunService")
 
 
@@ -73,7 +76,6 @@ local fovCircle = false
 local st = tonumber(tick())
 
 warn("Loading script...")
-
 local SilentAimTab = Window:NewTab("Silent Aim")
 local SilentAimSEC = SilentAimTab:NewSection("")
 SilentAimSEC:NewButton("Silent Aim", "Enables Silent aim", function(cx) 
@@ -92,8 +94,6 @@ SilentAimSEC:NewButton("Silent Aim", "Enables Silent aim", function(cx)
         end);
     end;
 end)
-
-
 local AATab = Window:NewTab("Anti-Aim")
 local AaSection = AATab:NewSection("Anti aim")
 AaSection:NewToggle("AntiAim Enabled", "", function(b)
@@ -145,9 +145,11 @@ end)
 print("Loading 20%")
 local Esps = Window:NewTab("ESP")
 local ESPSection = Esps:NewSection("")
-
 ESPSection:NewToggle("ESP Enabled", "", function(b)
     ESPEnabled = b
+end)
+ESPSection:NewColorPicker("ESP Main color", "", Color3.fromRGB(0,0,0), function(colorx)
+    EspColorMain = colorx
 end)
 ESPSection:NewToggle("Boxes", "", function(b)
     EspBoxes = b
@@ -158,6 +160,9 @@ end)
 ESPSection:NewToggle("Health", "", function(b)
     EspHealth = b
 end)
+ESPSection:NewToggle("Chams", "", function(b)
+    EspChams = b
+end)
 local WorldVisauls = Window:NewTab("Miscellaneous")
 local WorldVisaulsSec = WorldVisauls:NewSection("Wrld Visauls")
 WorldVisaulsSec:NewToggle("FullBright/No Fog", "", function(b)
@@ -166,15 +171,12 @@ end)
 WorldVisaulsSec:NewToggle("Raindbow Gun", "", function(bx)
     RGBgun = bx
 end)
-
 WorldVisaulsSec:NewDropdown("RGBGun Material", "", {"ForceField", "Glass", "Neon", "Plastic"}, function(Mat)
     RGBgunMaterial = Mat
 end)
-
 WorldVisaulsSec:NewButton("Anti restricted area kill", "", function(cx) 
     game:GetService("ReplicatedStorage").Events.KillMe:Destroy()
 end)
-
 local WorldVisaulsSec = WorldVisauls:NewSection("Misc")
 WorldVisaulsSec:NewToggle("Chat Spammer", "", function(b)
     chatSpammer = b
@@ -182,14 +184,11 @@ end)
 WorldVisaulsSec:NewDropdown("Mode", "", {"Emoji", "Wack", "EZ", "H3LLL0", "KIDS"}, function(d)
     chatSpammerOptions = d
 end)
-
 WorldVisaulsSec:NewToggle("Whizz all", "", function(b)
     WhizzerEnabled = b
 end)
-
 local PlayerX = Window:NewTab("Player")
 local PlayerSec = PlayerX:NewSection("Player stuff")
-
 PlayerSec:NewSlider("WalkSpeed", "", 200, 16, function(s) 
    Speed = s
 end)
@@ -199,16 +198,13 @@ end)
 PlayerSec:NewToggle("No fall damage", "", function(x)
     falling = x
 end)
-
 local Theme = Window:NewTab("Theme")
 local themeSec = Theme:NewSection("Theme changer")
-
 for theme, color in pairs(colors) do
     themeSec:NewColorPicker(theme, "Change your "..theme, color, function(color3)
         Library:ChangeColor(theme, color3)
     end)
 end
-
 local Credits = Window:NewTab("Credits")
 local Scripts = Credits:NewSection("Scripts made by H3LLL0/FAZED")
 
@@ -223,7 +219,40 @@ coroutine.wrap(function()
         end)
     end
 end)()
-
+coroutine.wrap(function()
+    while wait(1)do
+        pcall(function()
+            if ESPEnabled then
+                if EspChams then
+                    for _,v in pairs(game.Players:GetPlayers()) do
+                        if v.Name ~= LocalPlayer.Name and v.TeamColor ~= LocalPlayer.TeamColor then
+                            for _,c in pairs(HumParts)do
+                                if v.Character:FindFirstChild(c)then
+                                    local part=v.Character[c]
+                                    local a=Instance.new("BoxHandleAdornment")
+                                    if c=="Head"then
+                                        a.Size=Vector3.new(1.05,1.05,1.05)
+                                    else
+                                        a.Size=part.Size+Vector3.new(.05,.05,.05)
+                                    end
+                                    a.Parent=game.CoreGui
+                                    a.AlwaysOnTop=true
+                                    a.Adornee=part
+                                    a.ZIndex=0
+                                    a.Color3=EspColorMain
+                                    coroutine.wrap(function()
+                                        wait(1.1)
+                                        a:Destroy()
+                                    end)()                                
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)()
 print("Loading 45%")
 local angle = 0
 print("Loading 50%")
@@ -363,14 +392,14 @@ game:GetService("RunService").RenderStepped:connect(function()
                     if EspNames then
                     local a=Drawing.new("Text")
                     a.Text=v.Name
-                    a.Size=math.clamp(17-(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude,17,85)
+                    a.Size=math.clamp(16-(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude,16,83)
                     a.Center=true
                     a.Outline=true
                     a.OutlineColor=Color3.new()
                     a.Font=Drawing.Fonts.UI
                     a.Visible=true
                     a.Transparency=1
-                    a.Color=Color3.new(1,1,0)
+                    a.Color=EspColorMain
                     a.Position=Vector2.new(
                         game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/25)).X,
                         game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/25)).Y)
@@ -492,10 +521,7 @@ end)
 
 setreadonly(mt, true)
 
-
-
 print("Done")
-
 function getnearest()
 	local nearestmagnitude = math.huge
 	local nearestenemy = nil
@@ -533,8 +559,6 @@ mt.__namecall = function(self,...)
    return namecall(self,...)
 end
 
-
-
 warn("Script loaded!\nTime taken: "..math.abs(tonumber(tick())-st))
 RunService:BindToRenderStep("SilentAim",1,function()
 	if UserInputService:IsMouseButtonPressed(0) and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChild("Humanoid") and Players.LocalPlayer.Character.Humanoid.Health > 0 then
@@ -568,6 +592,4 @@ RunService:BindToRenderStep("SilentAim",1,function()
 		end
 	end
 end)
-
-
 print("Done2")
