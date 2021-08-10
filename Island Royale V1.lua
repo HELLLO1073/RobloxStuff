@@ -11,7 +11,7 @@ local colors =
     ElementColor = Color3.fromRGB(20, 20, 20)
 }
 
-local Window = Library.CreateLib("Island Royale | H3LLL0 - V:1.5", colors)
+local Window = Library.CreateLib("Island Royale | H3LLL0 - V:1.6", colors)
 print("Loading 1%")
 --#vars
 local Camera = workspace.CurrentCamera
@@ -29,6 +29,14 @@ local EspColorChams
 local EspColorChamsOutline
 local WrldEspEnabled = false
 local WrldEspChests = false
+local World_Visuals_Enabled = false
+local World_Ambient = nil
+local World_OutDoorAmbient = nil
+local World_Brightness = nil
+local World_Blur_Effect = nil
+local World_Time = nil
+local World_CrossColor = nil
+local XLighting = game.GetService(game, "Lighting") 
 local RunService = game:GetService("RunService")
 local Players   = game.GetService(game, "Players")
 local Player    = Players.LocalPlayer
@@ -124,6 +132,32 @@ end)
 PlrSec:NewSlider("Spin Strength", "", 250, 0, function(s) -- 500 (MaxValue) | 0 (MinValue)
     YawStrentgh = s
 end)
+local WorldVisualstab = Window:NewTab("World Visuals")
+local WorldVisualSec = WorldVisualstab:NewSection("Lighting")
+WorldVisualSec:NewToggle("Enabled", "", function(b)
+    World_Visuals_Enabled = b
+end)
+WorldVisualSec:NewColorPicker("Ambient (Set first)", "", Color3.fromRGB(0,1,0), function(colorx)
+    World_Ambient = colorx
+end)
+WorldVisualSec:NewColorPicker("OutDoor Ambient", "", Color3.fromRGB(0,1,0), function(colorx)
+    World_OutDoorAmbient = colorx
+end)
+WorldVisualSec:NewColorPicker("Gun cross-hair Color", "", Color3.fromRGB(0,1,0), function(colorx)
+    World_CrossColor = colorx
+end)
+WorldVisualSec:NewSlider("Brightness", "", 100, 0, function(s) 
+    World_Brightness = s
+end)
+WorldVisualSec:NewSlider("Time", "", 23, 0, function(s) 
+    World_Time = s
+end)
+WorldVisualSec:NewSlider("Blur", "", 100, 0, function(s) 
+    World_Blur_Effect = s
+end)
+
+local CrossHair = Player.PlayerGui["Core_UI"].Crosshairs
+
 local Theme = Window:NewTab("Theme")
 local themeSec = Theme:NewSection("Theme changer")
 for theme, color in pairs(colors) do
@@ -137,7 +171,23 @@ local Scripts = Credits:NewSection("Scripts made by H3LLL0/FAZED")
 Scripts:NewKeybind("UI Key", "", Enum.KeyCode.P, function(bv)
 	Library:ToggleUI()    
 end)
-
+coroutine.wrap(function()
+    while wait(.09)do
+        pcall(function()
+            if World_Visuals_Enabled then                
+                XLighting.Ambient = World_Ambient
+                XLighting.OutdoorAmbient = World_OutDoorAmbient
+                XLighting.Brightness = World_Brightness
+                XLighting.TimeOfDay = World_Time                
+                XLighting["Blur_Effect"].Size = World_Blur_Effect
+                for i,v in pairs(CrossHair:GetChildren()) do
+                    v.BackgroundColor3 = World_CrossColor
+                    v.BorderColor3 = Color3.new(0,0,0)
+                end
+            end
+        end)
+    end
+end)()
 coroutine.wrap(function()
     while wait(1)do
         pcall(function()
@@ -316,7 +366,6 @@ local function getClosestPlayer()
             end;
         end;
     end;
-    
     return closestPlayer;
 end;
 
