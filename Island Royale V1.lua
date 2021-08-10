@@ -1,6 +1,7 @@
 --Island Royale
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+
 local colors = 
 {
     SchemeColor = Color3.fromRGB(255, 0, 0),
@@ -9,7 +10,8 @@ local colors =
     TextColor = Color3.fromRGB(255,255,255),
     ElementColor = Color3.fromRGB(20, 20, 20)
 }
-local Window = Library.CreateLib("Island Royale | H3LLL0 - V:1", colors)
+
+local Window = Library.CreateLib("Island Royale | H3LLL0 - V:1.5", colors)
 print("Loading 1%")
 --#vars
 local Camera = workspace.CurrentCamera
@@ -33,6 +35,7 @@ local Player    = Players.LocalPlayer
 local Mouse     = Player:GetMouse()
 local CurrentCam = game.GetService(game, "Workspace").CurrentCamera;
 local InfiniteJumpEnabled = false
+local SpinbotEnabled = false
 warn("Loading script...")
 local MainTab = Window:NewTab("Main")
 local MainSec = MainTab:NewSection("")
@@ -112,6 +115,14 @@ WorldEspSection:NewToggle("ESP Enabled (Set color)", "", function(b)
 end)
 WorldEspSection:NewToggle("Chests", "", function(b)
     WrldEspChests = b
+end)
+local PlayerT = Window:NewTab("Anit-Aim")
+local PlrSec = PlayerT:NewSection("")
+PlrSec:NewToggle("Spinbot", "", function(b)
+    SpinbotEnabled = b
+end)
+PlrSec:NewSlider("Spin Strength", "", 250, 0, function(s) -- 500 (MaxValue) | 0 (MinValue)
+    YawStrentgh = s
 end)
 local Theme = Window:NewTab("Theme")
 local themeSec = Theme:NewSection("Theme changer")
@@ -279,7 +290,13 @@ game:GetService("RunService").RenderStepped:connect(function()
                 end
             end
         end
-    end    
+    end
+    if SpinbotEnabled then
+        game.Players.LocalPlayer.Character.Humanoid.AutoRotate = false
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(YawStrentgh), 0)
+    else 
+        game.Players.LocalPlayer.Character.Humanoid.AutoRotate = true	
+    end  
 end)
 
 
@@ -321,7 +338,5 @@ oldHook = hookmetamethod(game, "__namecall", function(self, ...)
     
     return oldHook(self, unpack(args));
 end);
-
-print'running' -- made by the sexy beast named icee
 
 print("Done Loading")
