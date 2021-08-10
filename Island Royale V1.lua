@@ -9,7 +9,7 @@ local colors =
     TextColor = Color3.fromRGB(255,255,255),
     ElementColor = Color3.fromRGB(20, 20, 20)
 }
-local Window = Library.CreateLib("Unit 1968 | H3LLL0 - V:1", colors)
+local Window = Library.CreateLib("Island Royale | H3LLL0 - V:1", colors)
 print("Loading 1%")
 --#vars
 local Camera = workspace.CurrentCamera
