@@ -39,6 +39,8 @@ local World_Time = nil
 local World_CrossColor = Color3.new(1,0,0)
 --Player
 local Player_InfiniteJump = false
+local SpinbotEnabled = false
+local SpinStrength
 --Other
 local UserInputService = game:GetService("UserInputService")
 local XLighting = game.GetService(game, "Lighting") 
@@ -97,7 +99,13 @@ end)
 PlayerSection:addSlider("Player Fov", 0, 0, 120, function(valuex)
     CurrentCam.FieldOfView = valuex
 end)
-
+local PlayerSection = PlayerPage:addSection("Anit-Aim")
+PlayerSection:addToggle("Spinbot", nil, function(state)
+    SpinbotEnabled = state
+end)
+PlayerSection:addSlider("Spin Strenght", 0, 0, 120, function(valuex)
+    SpinStrength = valuex
+end)
 
 local ESP_Page = Main:addPage("ESP", 5012544693)
 local ESPSection = ESP_Page:addSection("ESP")
@@ -405,11 +413,17 @@ game:GetService("RunService").RenderStepped:connect(function()
                                 end
                             end
                         end
-                    end                   
+                    end                                      
                 end
             end
         end
     end
+    if SpinbotEnabled then
+        game.Players.LocalPlayer.Character.Humanoid.AutoRotate = false
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(SpinStrength), 0)
+    else 
+        game.Players.LocalPlayer.Character.Humanoid.AutoRotate = true	
+    end 
 end)
 print("Loading | %80")
 
