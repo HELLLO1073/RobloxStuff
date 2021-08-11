@@ -9,7 +9,7 @@ local colors =
     ElementColor = Color3.fromRGB(20, 20, 20)
 }
 
-local Window = Library.CreateLib("Too easy FPS | H3LLL0 - V:1", colors)
+local Window = Library.CreateLib("Unit 1968 | H3LLL0 - V:4", colors)
 --[[ 
     [THEMES]
     LightTheme
@@ -52,25 +52,17 @@ local SAEnabled = false
 local fovCircle = false
 local st = tonumber(tick())
 
-
 warn("Loading script...")
 local MainTab = Window:NewTab("Main")
 local MainSec = MainTab:NewSection("")
-MainSec:NewButton("Silent Aim", "Enables Silent aim", function(cx) 
-	fovCircle = true   
-    SAEnabled = true
-    if fovCircle then
-        function createcircle()
-            local a=Drawing.new('Circle');a.Transparency=1;a.Thickness=1.5;a.Visible=true;a.Color=Color3.fromRGB(0, 0, 255);a.Filled=false;a.Radius=fov;
-            return a;
-        end;  
-        local fovc = createcircle();
-        spawn(function()
-            RunService:BindToRenderStep("FovCircle",1,function()
-                fovc.Position = Vector2.new(mouse.X,mouse.Y)                
-            end);
-        end);
-    end;
+MainSec:NewToggle("Silent Aim", "", function(b)
+    SAEnabled = b
+end)
+MainSec:NewToggle("Fov Circle", "", function(b)
+    fovCircle = b
+end)
+MainSec:NewSlider("FOV", "", 500, 25, function(s) 
+    fov = s
 end)
 
 local GunTab = Window:NewTab("Weapon Mods")
@@ -83,10 +75,10 @@ GunSection:NewToggle("No Recoil", "Infinite ammo", function(b)
     gunmod1 = b
 end)
 GunSection:NewToggle("Fast firerate", "", function(b)
-    gunmod2 = b
+    gunmod3 = b
 end)
 GunSection:NewToggle("No spread", "no gun spread", function(b)
-    gunmod3 = b
+    gunmod2 = b
 end)
 print("Loading 20%")
 local Esps = Window:NewTab("ESP")
@@ -331,6 +323,20 @@ game:GetService("RunService").RenderStepped:connect(function()
                 end
             end
         end    
+    end
+    if fovCircle then
+        local fovc=Drawing.new("Circle")
+        fovc.Visible=true
+        fovc.Position=Vector2.new(game:GetService("CoreGui").RobloxGui.AbsoluteSize.X/2,game:GetService("CoreGui").RobloxGui.AbsoluteSize.Y/2-game:GetService("CoreGui").TopBar.AbsolutePosition.Y/2)
+        fovc.Color=Color3.new(0,0,175/255)
+        fovc.Thickness=2.5
+        fovc.Transparency=1
+        fovc.NumSides=100
+        fovc.Radius=fov
+        coroutine.wrap(function()
+            game.RunService.RenderStepped:wait()
+            fovc:Remove()
+        end)()
     end
 end)
 
