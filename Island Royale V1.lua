@@ -1,63 +1,67 @@
 --Island Royale
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-
-local colors = 
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
+local Main = library.new("Island Royale V2 | H3LLLO", 5013109572)
+print("Loading")
+-- themes
+local themes = 
 {
-    SchemeColor = Color3.fromRGB(255, 0, 0),
-    Background = Color3.fromRGB(0, 0, 0),
-    Header = Color3.fromRGB(0, 0, 0),
-    TextColor = Color3.fromRGB(255,255,255),
-    ElementColor = Color3.fromRGB(20, 20, 20)
+    Background = Color3.fromRGB(24, 24, 24),
+    Glow = Color3.fromRGB(0, 0, 0),
+    Accent = Color3.fromRGB(10, 10, 10),
+    LightContrast = Color3.fromRGB(20, 20, 20),
+    DarkContrast = Color3.fromRGB(14, 14, 14),  
+    TextColor = Color3.fromRGB(255, 255, 255)
 }
 
-local Window = Library.CreateLib("Island Royale | H3LLL0 - V:1.6", colors)
-print("Loading 1%")
 --#vars
-local Camera = workspace.CurrentCamera
-local UserInputService = game:GetService("UserInputService")
-local HumParts ={ "RightHand ","LeftLowerArm","LeftUpperArm","LowerTorso","RightLowerArm","LeftUpperLeg","RightUpperLeg","RightUpperArm","RightLowerLeg","LeftLowerLeg","UpperTorso","Head","LeftHand"}
-local EspBoxes = false
-local EspNames = false 
-local EspHealth = false
-local EspShield = false
-local ESPEnabled = false
-local EspChams = false
-local EspChamsOutline = false
-local EspColorMain
-local EspColorChams
-local EspColorChamsOutline
-local WrldEspEnabled = false
-local WrldEspChests = false
+local Character_Parts ={ "RightHand ","LeftLowerArm","LeftUpperArm","LowerTorso","RightLowerArm","LeftUpperLeg","RightUpperLeg","RightUpperArm","RightLowerLeg","LeftLowerLeg","UpperTorso","Head","LeftHand"}
+--ESP
+local ESP_Boxes = false
+local ESP_Names = false 
+local ESP_Health = false
+local ESP_Shieald = false
+local ESP_Enabled = false
+local ESP_Chams = false
+local ESP_Chams_Outline = false
+local ESP_Main_Color = Color3.new(1,0,0)
+local ESP_Chams_Color = Color3.new(0,0,0)
+local ESP_Chams_Outline_Color = Color3.new(1,0,0)
+local World_ESP_Enabled = false
+local World_ESP_Chests = false
+--World
 local World_Visuals_Enabled = false
-local World_Ambient = nil
+local World_Ambient = Color3.new(0,0,0)
 local World_OutDoorAmbient = nil
 local World_Brightness = nil
 local World_Blur_Effect = nil
 local World_Time = nil
-local World_CrossColor = nil
+local World_CrossColor = Color3.new(1,0,0)
+--Player
+local Player_InfiniteJump = false
+--Other
+local UserInputService = game:GetService("UserInputService")
 local XLighting = game.GetService(game, "Lighting") 
 local RunService = game:GetService("RunService")
 local Players   = game.GetService(game, "Players")
 local Player    = Players.LocalPlayer
 local Mouse     = Player:GetMouse()
 local CurrentCam = game.GetService(game, "Workspace").CurrentCamera;
-local InfiniteJumpEnabled = false
-local SpinbotEnabled = false
-warn("Loading script...")
-local MainTab = Window:NewTab("Main")
-local MainSec = MainTab:NewSection("")
-MainSec:NewToggle("Silent Aim", "", function(b)
-    SAEnabled = b
+print("Loading | %20")
+-- first page
+local SA_Page = Main:addPage("Aimbot", 5012544693)
+local SASection = SA_Page:addSection("Silent Aim")
+SASection:addToggle("Silent Aim Enabled", nil, function(state)
+    SAEnabled = state
 end)
 
 
-local PlayerT = Window:NewTab("Player")
-local PlrSec = PlayerT:NewSection("")
-PlrSec:NewToggle("Infinite Jump", "", function(b)
-    InfiniteJumpEnabled = b
+local PlayerPage = Main:addPage("Player", 5012544693)
+local PlayerSection = PlayerPage:addSection("Player")
+PlayerSection:addToggle("Infinite Jump", nil, function(state)
+    Player_InfiniteJump = state
 end)
-PlrSec:NewButton("Speed Bypass (Press Q)", "", function(b)
+PlayerSection:addButton("Speed Bypass Q (Dont Hold)", function()
     down = false
     velocity = Instance.new("BodyVelocity")
     velocity.maxForce = Vector3.new(100000, 0, 100000)   
@@ -89,91 +93,143 @@ PlrSec:NewButton("Speed Bypass (Press Q)", "", function(b)
     end    
     onSelected(game.Players.LocalPlayer:GetMouse())
 end)
-print("Loading 20%")
-local Esps = Window:NewTab("Player ESP")
-local ESPSection = Esps:NewSection("")
-ESPSection:NewToggle("ESP Enabled (Set color)", "", function(b)
-    ESPEnabled = b
+
+
+local ESP_Page = Main:addPage("ESP", 5012544693)
+local ESPSection = ESP_Page:addSection("ESP")
+local ESPSection2 = ESP_Page:addSection("World ESP")
+
+ESPSection:addToggle("ESP Enabled", nil, function(state)
+    ESP_Enabled = state
 end)
-ESPSection:NewColorPicker("ESP Main color", "", Color3.fromRGB(1,0,0), function(colorx)
-    EspColorMain = colorx
+ESPSection:addToggle("ESP Boxes", nil, function(state)
+    ESP_Boxes = state
 end)
-ESPSection:NewToggle("Boxes", "", function(b)
-    EspBoxes = b
+ESPSection:addToggle("ESP Names", nil, function(state)
+    ESP_Names = state
 end)
-ESPSection:NewToggle("Names", "", function(b)
-    EspNames = b
+ESPSection:addToggle("ESP Chams", nil, function(state)
+    ESP_Chams = state
 end)
-ESPSection:NewToggle("Chams", "", function(b)
-    EspChams = b
+ESPSection:addToggle("ESP Chams Visible outline", nil, function(state)
+    ESP_Chams_Outline = state
 end)
-ESPSection:NewToggle("Chams Vis Outline", "", function(b)
-    EspChamsOutline = b
+ESPSection:addColorPicker("ESP Main Color", Color3.fromRGB(200, 0, 0), function(s)
+    ESP_Main_Color = s
 end)
-ESPSection:NewColorPicker("Chams Color", "", Color3.fromRGB(1,0,0), function(colorx)
-    EspColorChams = colorx
+ESPSection:addColorPicker("ESP Chams Color", Color3.fromRGB(255, 255, 255), function(s)
+    ESP_Chams_Color = s
 end)
-ESPSection:NewColorPicker("Chams Outline Color", "", Color3.fromRGB(0,1,0), function(colorx)
-    EspColorChamsOutline = colorx
+ESPSection:addColorPicker("ESP Chams Visible Color", Color3.fromRGB(255, 0, 0), function(s)
+    ESP_Chams_Outline_Color = s
 end)
-local WorldEsp = Window:NewTab("World ESP")
-local WorldEspSection = WorldEsp:NewSection("")
-WorldEspSection:NewToggle("ESP Enabled (Set color)", "", function(b)
-    WrldEspEnabled = b
+--Section 2
+ESPSection2:addToggle("World ESP Enabled", nil, function(state)
+    World_ESP_Enabled = state
 end)
-WorldEspSection:NewToggle("Chests", "", function(b)
-    WrldEspChests = b
-end)
-local PlayerT = Window:NewTab("Anit-Aim")
-local PlrSec = PlayerT:NewSection("")
-PlrSec:NewToggle("Spinbot", "", function(b)
-    SpinbotEnabled = b
-end)
-PlrSec:NewSlider("Spin Strength", "", 250, 0, function(s) -- 500 (MaxValue) | 0 (MinValue)
-    YawStrentgh = s
-end)
-local WorldVisualstab = Window:NewTab("World Visuals")
-local WorldVisualSec = WorldVisualstab:NewSection("Lighting")
-WorldVisualSec:NewToggle("Enabled", "", function(b)
-    World_Visuals_Enabled = b
-end)
-WorldVisualSec:NewColorPicker("Ambient (Set first)", "", Color3.fromRGB(0,1,0), function(colorx)
-    World_Ambient = colorx
-end)
-WorldVisualSec:NewColorPicker("OutDoor Ambient", "", Color3.fromRGB(0,1,0), function(colorx)
-    World_OutDoorAmbient = colorx
-end)
-WorldVisualSec:NewColorPicker("Gun cross-hair Color", "", Color3.fromRGB(0,1,0), function(colorx)
-    World_CrossColor = colorx
-end)
-WorldVisualSec:NewSlider("Brightness", "", 100, 0, function(s) 
-    World_Brightness = s
-end)
-WorldVisualSec:NewSlider("Time", "", 23, 0, function(s) 
-    World_Time = s
-end)
-WorldVisualSec:NewSlider("Blur", "", 100, 0, function(s) 
-    World_Blur_Effect = s
+ESPSection2:addToggle("ESP Chests", nil, function(state)
+    World_ESP_Chests = state
 end)
 
-local CrossHair = Player.PlayerGui["Core_UI"].Crosshairs
+local WorldPage = Main:addPage("World", 5012544693)
+local WorldSection = WorldPage:addSection("World")
+WorldSection:addToggle("World Enabled", nil, function(state)
+    World_Visuals_Enabled = state
+end)
+WorldSection:addColorPicker("Ambient", Color3.fromRGB(200, 0, 0), function(s)
+    World_Ambient = s
+end)
+WorldSection:addColorPicker("Ambient 2", Color3.fromRGB(255, 255, 255), function(s)
+    World_OutDoorAmbient = s
+end)
+WorldSection:addColorPicker("Gun cross-hair color", Color3.fromRGB(255, 0, 0), function(s)
+    World_CrossColor = s
+end)
+WorldSection:addSlider("Brightness", 0, 0, 100, function(valuex)
+    World_Brightness = valuex
+end)
+WorldSection:addSlider("Time", 0, 0, 23, function(valuex)
+    World_Time = valuex
+end)
+WorldSection:addSlider("Blur", 0, 0, 100, function(valuex)
+    World_Blur_Effect = valuex
+end)
 
-local Theme = Window:NewTab("Theme")
-local themeSec = Theme:NewSection("Theme changer")
-for theme, color in pairs(colors) do
-    themeSec:NewColorPicker(theme, "Change your "..theme, color, function(color3)
-        Library:ChangeColor(theme, color3)
-    end)
+print("Loading | %40")
+local theme = Main:addPage("UI", 5012544693)
+local Keybind = theme:addSection("Keybind")
+Keybind:addKeybind("Toggle Keybind", Enum.KeyCode.P, function()    
+    Main:toggle()
+    end, function()
+    print("Changed Keybind")
+end)
+
+local colors = theme:addSection("Colors")
+for theme, color in pairs(themes) do 
+colors:addColorPicker(theme, color, function(color3)
+Main:setTheme(theme, color3)
+end)
 end
 
-local Credits = Window:NewTab("Misc")
-local Scripts = Credits:NewSection("Scripts made by H3LLL0/FAZED")
-Scripts:NewKeybind("UI Key", "", Enum.KeyCode.P, function(bv)
-	Library:ToggleUI()    
-end)
+print("Loading | %50")
+--Main
 coroutine.wrap(function()
-    while wait(.09)do
+    while wait(1)do
         pcall(function()
+            if ESP_Enabled then
+                if ESP_Chams then
+                    for _,v in pairs(Players.GetPlayers(Players)) do
+                        if v.Name ~= Player.Name and v.TeamName.Value ~= Player.TeamName.Value then
+                            for _,c in pairs(Character_Parts)do
+                                if v.Character:FindFirstChild(c)then
+                                    local part=v.Character[c]
+                                    local a=Instance.new("BoxHandleAdornment")
+                                    if c=="Head"then
+                                        a.Size=Vector3.new(1.05,1.05,1.05)
+                                    else
+                                        a.Size=part.Size+Vector3.new(.05,.05,.05)
+                                    end
+                                    a.Parent=game.CoreGui
+                                    a.AlwaysOnTop=true
+                                    a.Adornee=part
+                                    a.ZIndex=0
+                                    a.Transparency = 0.5
+                                    a.Color3=ESP_Chams_Color
+                                    coroutine.wrap(function()
+                                        wait(1)
+                                        a:Destroy()
+                                    end)()                               
+                                    if ESP_Chams_Outline then
+                                    local part=v.Character[c]
+                                    local a=Instance.new("BoxHandleAdornment")
+                                    local off=0.4
+                                    if c=="Head"then
+                                        a.Size=Vector3.new(1+off,1+off,1+off)
+                                    else
+                                        a.Size=part.Size+Vector3.new(off,off,off)
+                                    end
+                                    a.Parent=game.CoreGui
+                                    a.AlwaysOnTop=false
+                                    a.Adornee=part
+                                    a.ZIndex=0
+                                    a.Color3=ESP_Chams_Outline_Color
+                                    coroutine.wrap(function()
+                                        wait(1.1)
+                                        a:Destroy()
+                                        end)()
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            Mouse.KeyDown:connect(function(key)
+                if Player_InfiniteJump and key == " " then
+                    game.Players.LocalPlayer.Character.Humanoid:ChangeState(3)  
+                    wait()      
+                end
+            end)
             if World_Visuals_Enabled then                
                 XLighting.Ambient = World_Ambient
                 XLighting.OutdoorAmbient = World_OutDoorAmbient
@@ -188,75 +244,15 @@ coroutine.wrap(function()
         end)
     end
 end)()
-coroutine.wrap(function()
-    while wait(1)do
-        pcall(function()
-            if ESPEnabled then
-                if EspChams then
-                    for _,v in pairs(Players.GetPlayers(Players)) do
-                        if v.Name ~= Player.Name and v.TeamName.Value ~= Player.TeamName.Value then
-                            for _,c in pairs(HumParts)do
-                                if v.Character:FindFirstChild(c)then
-                                    local part=v.Character[c]
-                                    local a=Instance.new("BoxHandleAdornment")
-                                    if c=="Head"then
-                                        a.Size=Vector3.new(1.05,1.05,1.05)
-                                    else
-                                        a.Size=part.Size+Vector3.new(.05,.05,.05)
-                                    end
-                                    a.Parent=game.CoreGui
-                                    a.AlwaysOnTop=true
-                                    a.Adornee=part
-                                    a.ZIndex=0
-                                    a.Transparency = 0.5
-                                    a.Color3=EspColorChams
-                                    coroutine.wrap(function()
-                                        wait(1)
-                                        a:Destroy()
-                                    end)()                               
-                                    if EspChamsOutline then
-                                    local part=v.Character[c]
-                                    local a=Instance.new("BoxHandleAdornment")
-                                    local off=0.4
-                                    if c=="Head"then
-                                        a.Size=Vector3.new(1+off,1+off,1+off)
-                                    else
-                                        a.Size=part.Size+Vector3.new(off,off,off)
-                                    end
-                                    a.Parent=game.CoreGui
-                                    a.AlwaysOnTop=false
-                                    a.Adornee=part
-                                    a.ZIndex=0
-                                    a.Color3=EspColorChamsOutline
-                                    coroutine.wrap(function()
-                                        wait(1.1)
-                                        a:Destroy()
-                                        end)()
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-            Mouse.KeyDown:connect(function(key)
-                if InfiniteJumpEnabled and key == " " then
-                    game.Players.LocalPlayer.Character.Humanoid:ChangeState(3)  
-                    wait()      
-                end
-            end)
-        end)
-    end
-end)()
-print("Loading 45%")
+print("Loading | %70")
 game:GetService("RunService").RenderStepped:connect(function()   
-    if ESPEnabled then
+    if ESP_Enabled then
         for _,v in pairs(Players.GetPlayers(Players)) do
 			if v.Name ~= Player.Name and v.TeamName.Value ~= Player.TeamName.Value then
             local part=v.Character.HumanoidRootPart
             local _,b=game.Workspace.CurrentCamera:WorldToViewportPoint(part.Position)
                 if b then
-                    if EspNames then
+                    if ESP_Names then
                         local a=Drawing.new("Text")
                         a.Text=v.Name
                         a.Size=math.clamp(16-(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude,16,83)
@@ -266,7 +262,7 @@ game:GetService("RunService").RenderStepped:connect(function()
                         a.Font=Drawing.Fonts.UI
                         a.Visible=true
                         a.Transparency=1
-                        a.Color=EspColorMain
+                        a.Color=ESP_Main_Color
                         a.Position=Vector2.new(
                             game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/25)).X,
                             game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/25)).Y)
@@ -275,10 +271,10 @@ game:GetService("RunService").RenderStepped:connect(function()
                         a:Remove()
                         end)()
                     end
-                    if EspBoxes then
+                    if ESP_Boxes then
                         local a=Drawing.new("Quad")
                         a.Visible=true
-                        a.Color=EspColorMain
+                        a.Color=ESP_Main_Color
                         a.Thickness=1
                         a.Transparency=1
                         a.Filled=false
@@ -298,57 +294,51 @@ game:GetService("RunService").RenderStepped:connect(function()
                         game.RunService.RenderStepped:Wait()
                         a:Remove()
                         end)()
+                    end
+                    if World_ESP_Enabled then                    
+                        if World_ESP_Chests then
+                            for _,v in pairs(game:GetService("Workspace")["Crate_Spawns"]:GetChildren()) do
+                                if v.ClassName == "Model" then
+                                    for x,c in pairs(v:GetChildren()) do
+                                        if c.Name == "ChestTop" then
+                                            local Chestx = c 
+                                            local _,n=game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.Position)
+                                            if n then
+                                                local a=Drawing.new("Quad")
+                                                a.Visible=true
+                                                a.Color=Color3.new(1,1,0)
+                                                a.Thickness=2
+                                                a.Transparency=1
+                                                a.Filled=false
+                                                a.PointA=Vector2.new(
+                                                 game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*-2+Chestx.CFrame.UpVector*2.5).X,
+                                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*-2+Chestx.CFrame.UpVector*2.5).Y)-->^
+                                                a.PointB=Vector2.new(
+                                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*2+Chestx.CFrame.UpVector*2.5).X,
+                                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*2+Chestx.CFrame.UpVector*2.5).Y)--<^
+                                                a.PointC=Vector2.new(
+                                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*2+Chestx.CFrame.UpVector*-2.5).X,
+                                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*2+Chestx.CFrame.UpVector*-2.5).Y)--<V
+                                                a.PointD=Vector2.new(
+                                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*-2+Chestx.CFrame.UpVector*-2.5).X,
+                                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*-2+Chestx.CFrame.UpVector*-2.5).Y)-->V
+                                                coroutine.wrap(function()
+                                                game.RunService.RenderStepped:Wait()
+                                                a:Remove()
+                                                end)()                                          
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
                     end                   
                 end
             end
         end
     end
-    if WrldEspEnabled then                    
-        if WrldEspChests then
-            for _,v in pairs(game:GetService("Workspace")["Crate_Spawns"]:GetChildren()) do
-                if v.ClassName == "Model" then
-                    for x,c in pairs(v:GetChildren()) do
-                        if c.Name == "ChestTop" then
-                            local Chestx = c 
-                            local _,n=game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.Position)
-                            if n then
-                                local a=Drawing.new("Quad")
-                                a.Visible=true
-                                a.Color=Color3.new(1,1,0)
-                                a.Thickness=2
-                                a.Transparency=1
-                                a.Filled=false
-                                a.PointA=Vector2.new(
-                                 game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*-2+Chestx.CFrame.UpVector*2.5).X,
-                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*-2+Chestx.CFrame.UpVector*2.5).Y)-->^
-                                a.PointB=Vector2.new(
-                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*2+Chestx.CFrame.UpVector*2.5).X,
-                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*2+Chestx.CFrame.UpVector*2.5).Y)--<^
-                                a.PointC=Vector2.new(
-                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*2+Chestx.CFrame.UpVector*-2.5).X,
-                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*2+Chestx.CFrame.UpVector*-2.5).Y)--<V
-                                a.PointD=Vector2.new(
-                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*-2+Chestx.CFrame.UpVector*-2.5).X,
-                                game.Workspace.CurrentCamera:WorldToViewportPoint(Chestx.CFrame.Position+Chestx.CFrame.RightVector*-2+Chestx.CFrame.UpVector*-2.5).Y)-->V
-                                coroutine.wrap(function()
-                                game.RunService.RenderStepped:Wait()
-                                a:Remove()
-                                end)()                                          
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    if SpinbotEnabled then
-        game.Players.LocalPlayer.Character.Humanoid.AutoRotate = false
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(YawStrentgh), 0)
-    else 
-        game.Players.LocalPlayer.Character.Humanoid.AutoRotate = true	
-    end  
 end)
-
+print("Loading | %80")
 
 -- player func
 local function getClosestPlayer()
@@ -368,7 +358,7 @@ local function getClosestPlayer()
     end;
     return closestPlayer;
 end;
-
+print("Loading | %90")
 -- main hook
 local oldHook;
 oldHook = hookmetamethod(game, "__namecall", function(self, ...)
