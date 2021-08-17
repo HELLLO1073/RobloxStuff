@@ -1,7 +1,5 @@
---Island Royale
-
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
-local Main = library.new("Island Royale V2 | H3LLLO", 5013109572)
+local Main = library.new("UNIT 1968 V6 | H3LLLO", 5013109572)
 print("Loading")
 -- themes
 local themes = 
