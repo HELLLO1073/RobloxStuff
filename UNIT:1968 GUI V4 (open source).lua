@@ -1,5 +1,5 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
-local Main = library.new("UNIT 1968 V6 | H3LLLO", 5013109572)
+local Main = library.new("UNIT 1968 V6.5 | H3LLLO", 5013109572)
 print("Loading")
 -- themes
 local themes = 
@@ -106,6 +106,9 @@ PlayerSection:addSlider("Jump Power", 50, 0, 100, function(valuex)
 end)
 PlayerSection:addToggle("No fall damage", nil, function(state)
     Nofall = state
+end)
+PlayerSection:addButton("No Restricted area kill", function()
+    game:GetService("ReplicatedStorage").Events.KillMe:Destroy()
 end)
 
 local ESP_Page = Main:addPage("ESP", 5012544693)
