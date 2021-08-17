@@ -75,13 +75,16 @@ local Camera = workspace.CurrentCamera
 local function whizzPlayer(Player, Size, Distance) 
     game:GetService("ReplicatedStorage").Events.Whizz:FireServer(Player, Size, Distance)
 end
-
+getfenv().lock = "Head" -- Head or Hitbox or Random
 print("Loading | %20")
 -- first page
 local SA_Page = Main:addPage("Aimbot", 5012544693)
 local SASection = SA_Page:addSection("Silent Aim")
 SASection:addToggle("Silent Aim Enabled", nil, function(state)
     SAEnabled = state
+end)
+SASection:addDropdown("Hitbox", {"Head", "Chest", "Random", 1, 2, 3}, function(text)
+    getfenv().lock = text
 end)
 SASection:addToggle("Show FOV", nil, function(state)
     ShowSAFov = state
