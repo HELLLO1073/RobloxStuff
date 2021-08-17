@@ -1,7 +1,7 @@
 --Island Royale
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
-local Main = library.new("UNIT:1968 V6 | H3LLLO", 5013109572)
+local Main = library.new("Island Royale V2 | H3LLLO", 5013109572)
 print("Loading")
 -- themes
 local themes = 
@@ -47,6 +47,9 @@ local gunmod7 = false
 local gunmod8 = false
 local gunmod9 = false
 local gunmod10 = false
+local RGBGun = false 
+local RGBGunMaterial = "Glass"
+local WhizzerEnabled = false
 --Player
 local SpinbotEnabled = false
 local SpinStrength
@@ -70,6 +73,11 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local mouse = LocalPlayer:GetMouse()
 local Camera = workspace.CurrentCamera
+-- functions
+local function whizzPlayer(Player, Size, Distance) 
+    game:GetService("ReplicatedStorage").Events.Whizz:FireServer(Player, Size, Distance)
+end
+
 print("Loading | %20")
 -- first page
 local SA_Page = Main:addPage("Aimbot", 5012544693)
@@ -168,6 +176,19 @@ GunSection:addToggle("Fast Aim", nil, function(b)
     gunmod9 = b
 end)
 
+local MiscPage = Main:addPage("Miscellaneous", 5012544693)
+local MiscSection = MiscPage:addSection("Visuals")
+local MiscSection2 = MiscPage:addSection("Players")
+MiscSection:addToggle("Rainbow Gun", nil, function(state)
+    RGBGun = state
+end)
+MiscSection:addDropdown("RGB Material", {"ForceField", "Glass", "Neon", "Plastic", 1, 2, 3}, function(text)
+    RGBGunMaterial = text
+end)
+MiscSection2:addToggle("Whizz annoy all", nil, function(state)
+    WhizzerEnabled = state
+end)
+
 local WorldPage = Main:addPage("Client World", 5012544693)
 local WorldSection = WorldPage:addSection("World")
 WorldSection:addToggle("World Enabled", nil, function(state)
@@ -185,6 +206,7 @@ end)
 WorldSection:addSlider("Time", 0, 0, 23, function(valuex)
     World_Time = valuex
 end)
+
 
 print("Loading | %40")
 local theme = Main:addPage("UI", 5012544693)
@@ -204,6 +226,18 @@ end
 
 print("Loading | %50")
 --Main
+coroutine.wrap(function()
+    while wait(.09)do
+        pcall(function()
+            if WhizzerEnabled then                
+                for _,v in pairs(game.Players:GetChildren())do
+                    whizzPlayer(v, "Large", -1)                    
+                    whizzPlayer(v, "Medium", 9999) 
+                end
+            end
+        end)
+    end
+end)()
 coroutine.wrap(function()
     while wait(1)do
         pcall(function()
@@ -312,6 +346,10 @@ coroutine.wrap(function()
 end)()
 
 print("Loading | %70")
+local c = 1
+function zigzag(X)
+return math.acos(math.cos(X * math.pi)) / math.pi
+end
 
 game:GetService("RunService").RenderStepped:connect(function()   
     if LPlayer.Backpack.CLIENT ~= nil then    
@@ -499,6 +537,20 @@ game:GetService("RunService").RenderStepped:connect(function()
         LPlayer.Character.Humanoid.WalkSpeed = WalkSpeed
         LPlayer.Character.Humanoid.JumpPower = JumPower
     end
+    if RGBGun then        
+        for i,q in pairs(game:GetService("Workspace").Camera:GetChildren()) do
+            if q.Name == "Arms" then
+                for i,v in pairs(q:GetDescendants()) do
+                    if v.ClassName == 'MeshPart' then 
+                        v.TextureID = ""
+                        v.Color = Color3.fromHSV(zigzag(c),1,1)
+                        c = c + .0001
+                        v.Material = RGBGunMaterial
+                    end                
+                end
+            end
+        end     
+    end  
 end)
 print("Loading | %80")
 function getnearest()
