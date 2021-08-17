@@ -55,6 +55,10 @@ local MovementOveride = false
 local WalkSpeed = 17
 local JumPower = 50
 local Nofall = false
+local RenderPlayer = false
+local CameraoffsetX = 0
+local CameraoffsetY = 0
+local CameraoffsetZ = 0
 
 --Other
 local XLighting = game.GetService(game, "Lighting") 
@@ -180,6 +184,30 @@ GunSection:addToggle("Fast Aim", nil, function(b)
     gunmod9 = b
 end)
 
+local AAPAge = Main:addPage("Anti-Aim", 5012544693)
+local AAsec = AAPAge:addSection("Anti-Aim")
+AAsec:addToggle("Spinbot", nil, function(b)
+    SpinbotEnabled = b
+end)
+AAsec:addSlider("Spinbot strength", 0, 0, 250, function(valuex)
+    SpinStrength = valuex
+end)
+local AAsec2 = AAPAge:addSection("Visual")
+AAsec2:addToggle("Render Player", nil, function(b)
+    RenderPlayer = b
+end)
+AAsec2:addSlider("Camera offset Z", 0, 0, 10, function(valuex)
+    CameraoffsetZ = valuex
+end)
+AAsec2:addSlider("Camera offset Y", 0, 0, 10, function(valuex)
+    CameraoffsetY = valuex
+end)
+AAsec2:addSlider("Camera offset X", 0, 0, 10, function(valuex)
+    CameraoffsetX = valuex
+end)
+
+
+
 local MiscPage = Main:addPage("Miscellaneous", 5012544693)
 local MiscSection = MiscPage:addSection("Visuals")
 local MiscSection2 = MiscPage:addSection("Players")
@@ -239,6 +267,38 @@ coroutine.wrap(function()
                     whizzPlayer(v, "Medium", 9999) 
                 end
             end
+        end)
+    end
+end)()
+coroutine.wrap(function()
+    while wait(.1)do
+        pcall(function()            
+            if RenderPlayer then
+                for i,q in pairs(game:GetService("Workspace").Camera:GetChildren()) do
+                    if q.Name == "Arms" then
+                        for i,v in pairs(q:GetDescendants()) do                            
+                            if v.ClassName == 'MeshPart' or v.ClassName == "Part" then 
+                                v.Transparency = 1
+                            end                                   
+                        end
+                    end
+                end 
+            end            
+        end)
+    end
+end)()
+coroutine.wrap(function()
+    while wait(.1)do
+        pcall(function()            
+            if RenderPlayer then
+                for _,v in pairs(game.Players.LocalPlayer.Character:GetDescendants())do
+                    if v:IsA("BasePart")or v:IsA("Decal")then
+                        if v.LocalTransparencyModifier ~= 0 then
+                            v.LocalTransparencyModifier = 0
+                        end
+                    end
+                end
+            end            
         end)
     end
 end)()
@@ -338,7 +398,10 @@ coroutine.wrap(function()
                         end
                     end 
                 end
-            end           
+            end 
+            game.Workspace.CurrentCamera.CFrame= 
+            game.Workspace.CurrentCamera.CFrame* 
+            CFrame.new(CameraoffsetX,CameraoffsetY,CameraoffsetZ)          
             if World_Visuals_Enabled then                
                 XLighting.Ambient = World_Ambient
                 XLighting.ColorCorrection.TintColor = World_OutDoorAmbient
@@ -356,10 +419,20 @@ return math.acos(math.cos(X * math.pi)) / math.pi
 end
 
 game:GetService("RunService").RenderStepped:connect(function()   
+    if RenderPlayer then
+        game.Workspace.CurrentCamera.CFrame=
+        game.Workspace.CurrentCamera.CFrame*
+        CFrame.new(CameraoffsetX,CameraoffsetY,CameraoffsetZ)
+    end
     if LPlayer.Backpack.CLIENT ~= nil then    
         local env = getsenv(LPlayer.Backpack.CLIENT)
         if env then 
             if env.equipped == "melee" or env.equipped == "grenade" then
+                if env.gun.FireRate ~= nil and gunmod5 then
+                    env.gun.Automatic.Value = true 
+                    env.gun.FireRate.Value = 0.1                    
+                    env.primarymode = "automatic"
+                end
             else 
                 if gunmod1 then 
                     env.ammocount  = 11
@@ -403,7 +476,13 @@ game:GetService("RunService").RenderStepped:connect(function()
                 end                        
             end             
         end
-    end  
+    end 
+    if SpinbotEnabled then
+        game.Players.LocalPlayer.Character.Humanoid.AutoRotate = false
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(SpinStrength), 0)
+    else 
+        game.Players.LocalPlayer.Character.Humanoid.AutoRotate = true           
+    end 
     if ESP_Enabled then
         for _,v in pairs(game.Players:GetPlayers()) do
             if v.Name ~= LPlayer.Name and v.TeamColor ~= LPlayer.TeamColor then
