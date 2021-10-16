@@ -49,7 +49,36 @@ function notify(title, message)
     end
 end
 
+repeat wait() until LPlayer.Character.HumanoidRootPart.Anchored == false    
+    for i, v in next, getconnections(game:GetService("Players").LocalPlayer.Character.DescendantAdded) do
+        v:Disable()
+	end
+    local success, err = pcall(function()
+        local mt = getrawmetatable(game)
+        setreadonly(mt, false)
+        local namecall = mt.__namecall
+
+        mt.__namecall = function(self,...)
+            local args = {...}
+
+            if tostring(getnamecallmethod()) == 'FindPartOnRayWithWhitelist' and getcallingscript() == game.Players.LocalPlayer.PlayerGui['_L.Handler'].GunHandlerLocal then
+                wait(9e9)
+                return
+            end
+            return namecall(self,...)
+        end
+    end)
+
+    if success then
+        notify("Anticheat", "Bypass Sucessful")
+    else
+        notify('Error', err)
+end
+
+wait(1)
+
 notify("ANOMIC V.1.2", "Scripts made by H3LLL0 - Forum: F A Z E D")
+
 
 local c = 1
 function zigzag(X)
