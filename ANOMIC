@@ -1,0 +1,387 @@
+local mainName = "Anomic V.1.2 | H3LLL0";
+
+print("Loading GUI")
+if game:GetService("CoreGui"):FindFirstChild(mainName) then
+    game.CoreGui[mainName]:Destroy()
+end
+print("Loading | LIB")
+--LIB
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
+local Main = library.new(mainName, 5013109572)
+
+print("LIB Success")
+print("Loading | 1%")
+
+-- Themes
+local themes  = 
+{Background   = Color3.fromRGB(24, 24, 24),
+Glow          = Color3.fromRGB(255, 255, 255),
+Accent        = Color3.fromRGB(10, 10, 10),
+LightContrast = Color3.fromRGB(20, 20, 20),
+DarkContrast  = Color3.fromRGB(14, 14, 14),  
+TextColor     = Color3.fromRGB(255, 255, 255)}
+-- ESP
+local esp_Enabled      = false
+local esp_Names        = false
+local esp_Boxes        = false
+local esp_Health       = false
+local esp_Chams        = false
+local esp_WantedLevel  = false
+local esp_Main_Colour  = Color3.fromRGB(200, 0, 0)
+local esp_Chams_Colour = Color3.fromRGB(200, 255, 0)
+local rainbow_char     = false
+local rainbow_hair     = false
+-- Player
+local Players  = game:GetService("Players")
+local LPlayer  = Players.LocalPlayer
+local camera   = game:GetService("Workspace").Camera
+local Hitboxes = false
+local headHitboxSize = 5
+local charParts = {"Head","LeftHand","LeftLowerArm","LeftUpperArm","RightHand","RightLowerArm","RightUpperArm","UpperTorso","LowerTorso","RightFoot","RightLowerLeg","RightUpperLeg","LeftFoot","LeftLowerLeg","LeftUpperLeg"}
+-- Functions 
+function notify(title, message)
+    game:GetService("Players").LocalPlayer.PlayerGui.Notify.TimePosition = 0
+    game:GetService("Players").LocalPlayer.PlayerGui.Notify.Playing = true
+    if not message then
+        require(game:GetService("ReplicatedStorage"):WaitForChild("Client").NotificationHandler):AddToStream(game.Players.LocalPlayer,title)
+    else
+        require(game:GetService("ReplicatedStorage"):WaitForChild("Client").NotificationHandler):AddToStream(game.Players.LocalPlayer,title..": "..message)
+    end
+end
+
+notify("ANOMIC V.1.2", "Scripts made by H3LLL0 - Forum: F A Z E D")
+
+local c = 1
+function zigzag(X)
+    return math.acos(math.cos(X * math.pi)) / math.pi
+end
+
+print("Loading | 20%")
+
+-- Aimbot / Hitboxes Page
+local Aimb = Main:addPage("Main", 5012544693)
+local ASection1 = Aimb:addSection("HitBoxes")
+ASection1:addToggle("Head hitboxes", nil, function(v)
+    Hitboxes = v
+end)
+ASection1:addSlider("Hitbox size", 1, 0, 55, function(v)
+    headHitboxSize = v
+end)
+
+--Player Page
+local PLa = Main:addPage("Player", 5012544693)
+local PlrSection = PLa:addSection("Movement")
+PlrSection:addSlider("Player Fov", 50, 0, 170, function(valuex)
+    camera.FieldOfView = valuex
+end)
+local plrApp = PLa:addSection("Appearance")
+plrApp:addToggle("Outfit Editer", nil, function(v)
+    LPlayer.PlayerGui.AvatarEditor.Enabled = v
+end)
+plrApp:addColorPicker("Skin Color", Color3.fromRGB(255, 255, 255), function(s)
+    game:GetService("ReplicatedStorage")["_CS.Events"].EquipAvatarItem:FireServer("Color",s,"SkinColor")
+end)
+plrApp:addColorPicker("Hair Color", Color3.fromRGB(255, 255, 255), function(s)
+    game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").EquipAvatarItem:FireServer("Color",s,"HairColor")
+end)
+plrApp:addToggle("Rainbow Character", nil, function(v)
+    rainbow_char = v
+end)
+plrApp:addToggle("Rainbow Hair", nil, function(v)
+    rainbow_hair = v
+end)
+local teamSection = PLa:addSection("TeamChanger  (Cooldown)")
+teamSection:addDropdown("Team changer", {"Gunsmith", "Civilian", "Advanced Gunsmith", "Trucker", "Tow Trucker", "Secret Service", "Advanced Car Dealer", "Car Dealer","Deliverant", "Criminal", "Crafter", "Cab Driver", "Paramedic", "Mayor", "Military", "SWAT", "Sheriff"}, function(team)
+    game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").TeamChanger:FireServer(team)
+end)
+
+-- ESP Page
+local Esp = Main:addPage("Visuals", 5012544693)
+local EspSection = Esp:addSection("Visuals")
+EspSection:addToggle("ESP Enabled", nil, function(v)
+    esp_Enabled = v
+end)
+local maxDisance = 1000;
+EspSection:addSlider("Max distance (Helps stop lag)", 100, 0, 2000, function(v)
+    maxDisance = v
+end)
+local EspSection1 = Esp:addSection("ESP Enabled")
+EspSection1:addToggle("ESP Boxes", nil, function(state)
+    esp_Boxes = state
+end)
+EspSection1:addToggle("ESP Health", nil, function(state)
+    esp_Health = state
+end)
+EspSection1:addToggle("ESP Names", nil, function(state)
+    esp_Names = state
+end)
+EspSection1:addToggle("ESP status level", nil, function(state)
+    esp_WantedLevel = state
+end)
+EspSection1:addColorPicker("ESP Main Color", Color3.fromRGB(200, 0, 0), function(s)
+    esp_Main_Colour = s
+end)
+local EspSection2 = Esp:addSection("ESP Chams")
+EspSection2:addToggle("Chams Enabled", nil, function(v)
+    esp_Chams = v
+end)
+EspSection2:addColorPicker("Chams Color", Color3.fromRGB(255, 0, 0), function(s)
+    esp_Chams_Colour = s
+end)
+
+local tele = Main:addPage("Teleportation", 5012544693)
+local teleSection = tele:addSection("Player")
+local targetName = nil;
+teleSection:addTextbox("Target Name", "Default", function(plr)
+    print(plr)
+    targetName = plr
+end)
+teleSection:addButton("Teleport", function()
+    for i,v in pairs(game:service'Players':GetPlayers()) do
+        if v.Name:match(targetName) then
+            LPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,2,0)
+        end
+    end
+end)
+
+local misc = Main:addPage("Miscellaneous", 5012544693)
+local miscSection = misc:addSection("Misc")
+miscSection:addButton("Unlock cars (LOOP)", function() 
+    while wait(3) do
+        for i,v in pairs(game:GetService("Workspace").PlayerVehicles:GetDescendants()) do
+            if v:IsA("VehicleSeat") or v:IsA("Seat") then
+                v.Disabled = false
+                wait(.3)
+            end
+        end
+    end
+end)
+
+print("Loading | 30%")
+
+local Ui = Main:addPage("UI", 5012544693)
+local UISection = Ui:addSection("UI")
+UISection:addKeybind("GUI Keybind", Enum.KeyCode.LeftAlt, function()    
+    Main:toggle()
+    end, function()    
+end)
+print("Loading | 40%")
+local colors = Ui:addSection("Colors")
+for theme, color in pairs(themes) do -- all in one theme changer, i know, im cool
+        colors:addColorPicker(theme, color, function(color3)            
+        Main:setTheme(theme, color3)            
+    end)
+end
+
+print("Loading | 50%")
+coroutine.wrap(function()
+    while wait(2)do
+        pcall(function()     
+            if Hitboxes then   
+                for i,v in pairs(game.Players:GetPlayers()) do
+                    if v.Name ~= game.Players.LocalPlayer.Name and v.Character and v.Character:FindFirstChild('Head')then
+                        v.Character.Head.Size = Vector3.new(headHitboxSize,headHitboxSize,headHitboxSize)
+                        v.Character.Head.Transparency = 0.7
+                        v.Character.Head.CanCollide = false
+                    end
+                end
+            end
+        end)
+    end
+end)()
+coroutine.wrap(function()
+    while wait(1)do
+        pcall(function()            
+            if esp_Enabled then
+                if esp_Chams then          
+                    for _,v in pairs(Players:GetPlayers()) do
+                        if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("Humanoid").Health > 0 and v ~= LPlayer then
+                            local distance = LPlayer:DistanceFromCharacter(v.Character.HumanoidRootPart.Position)
+                            for _,c in pairs(charParts) do
+                                if v.Character:FindFirstChild(c) and distance < maxDisance then
+                                    local part = v.Character[c]
+                                    local a = Instance.new("BoxHandleAdornment")
+                                    if c == "Head"then
+                                        a.Size = Vector3.new(1.05,1.05,1.05)
+                                    else
+                                        a.Size = part.Size + Vector3.new(.05,.05,.05)
+                                    end
+                                    a.Parent = game.CoreGui
+                                    a.AlwaysOnTop = true
+                                    a.Adornee = part
+                                    a.ZIndex = 0
+                                    a.Transparency = 0.5
+                                    a.Color3 = esp_Chams_Colour
+                                    coroutine.wrap(function()
+                                        wait(1)
+                                        a:Destroy()
+                                    end)()                  
+                                end
+                            end
+                        end
+                    end  
+                end     
+            end                    
+        end)
+    end
+end)()
+game:GetService("RunService").RenderStepped:connect(function()       
+    if esp_Enabled then       
+        for _,v in pairs(Players:GetChildren()) do
+            if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("Humanoid").Health > 0 and v ~= LPlayer then
+            local part = v.Character.HumanoidRootPart             
+            local distance = LPlayer:DistanceFromCharacter(v.Character.HumanoidRootPart.Position)
+            local _,b=game.Workspace.CurrentCamera:WorldToViewportPoint(part.Position)
+                if b then
+                    if esp_Names and distance < maxDisance and distance > 7 then
+                        local a=Drawing.new("Text")
+                        a.Text=v.Name 
+                        a.Size=math.clamp(16-(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude,16,83)
+                        a.Center=true
+                        a.Outline=true
+                        a.OutlineColor=Color3.new()
+                        a.Font=Drawing.Fonts.UI
+                        a.Visible=true
+                        a.Transparency=1
+                        a.Color=esp_Main_Colour
+                        a.Position=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/25)).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/40)).Y)
+                        coroutine.wrap(function()
+                        game.RunService.RenderStepped:Wait()
+                        a:Remove()
+                        end)()
+                    end
+                    if esp_Boxes and distance < maxDisance then
+                        local a=Drawing.new("Quad")
+                        a.Visible=true
+                        a.Color=esp_Main_Colour
+                        a.Thickness=1
+                        a.Transparency=1
+                        a.Filled=false
+                        a.PointA=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*-2+part.CFrame.UpVector*2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*-2+part.CFrame.UpVector*2.5).Y)
+                        a.PointB=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).Y)
+                        a.PointC=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).Y)
+                        a.PointD=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*-2+part.CFrame.UpVector*-2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*-2+part.CFrame.UpVector*-2.5).Y)
+                        coroutine.wrap(function()
+                        game.RunService.RenderStepped:Wait()
+                        a:Remove()
+                        end)()
+                    end
+                    if esp_Health and distance < maxDisance then
+                        local healthnum=v.Character.Humanoid.Health
+                        local maxhealth=v.Character.Humanoid.MaxHealth
+                        local c=Drawing.new("Quad")
+                        c.Visible=true
+                        c.Color=Color3.new(0,1,0)
+                        c.Thickness=1
+                        c.Transparency=1
+                        c.Filled=false
+                        c.PointA=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).Y)
+                        c.PointB=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).Y)
+                        c.PointC=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).Y)
+                        c.PointD=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).Y)
+                        coroutine.wrap(function()
+                        game.RunService.RenderStepped:Wait()
+                            c:Remove()
+                        end)()
+                        local e=Drawing.new("Quad")
+                        e.Visible=true
+                        e.Color=Color3.new(1,0,0)
+                        e.Thickness=1
+                        e.Transparency=1
+                        e.Filled=true
+                        e.PointA=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).Y)
+                        e.PointB=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).Y)
+                        e.PointC=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).Y)
+                        e.PointD=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).Y)
+                        coroutine.wrap(function()
+                            game.RunService.RenderStepped:Wait()
+                            e:Remove()
+                        end)()
+                        local d=Drawing.new("Quad")
+                        d.Visible=true
+                        d.Color=Color3.new(0,1,0)
+                        d.Thickness=1
+                        d.Transparency=1
+                        d.Filled=true
+                        d.PointA=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).Y)
+                        d.PointB=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).Y)
+                        d.PointC=c.PointC
+                        d.PointD=c.PointD
+                        coroutine.wrap(function()
+                            game.RunService.RenderStepped:Wait()
+                            d:Remove()
+                        end)()
+                    end     
+                    if esp_WantedLevel and distance < maxDisance and distance > 7 then
+                        local a = Drawing.new("Text")
+                        local wantedLevel = v.Character.Wanted.Value
+                        if wantedLevel == 1 then                           
+                            a.Text = "Innocent" 
+                            a.Color = Color3.fromRGB(60, 163, 0)
+                        else
+                            a.Text = "Wanted"
+                            a.Color = Color3.fromRGB(180, 0, 0)
+                        end
+                        a.Size=math.clamp(16-(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude,16,83)
+                        a.Center=true
+                        a.Outline=true
+                        a.OutlineColor=Color3.new()
+                        a.Font=Drawing.Fonts.UI
+                        a.Visible=true
+                        a.Transparency=1                        
+                        a.Position=Vector2.new(
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/25)).X,
+                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/75)).Y)
+                        coroutine.wrap(function()
+                        game.RunService.RenderStepped:Wait()
+                        a:Remove()
+                        end)()
+                    end                                         
+                end
+            end                       
+        end
+    end      
+    if rainbow_hair or rainbow_char then      
+        local colorx = Color3.fromHSV(zigzag(c),1,1)
+        c = c + .001
+        if rainbow_hair then        
+            game:GetService("ReplicatedStorage")["_CS.Events"].EquipAvatarItem:FireServer("Color",colorx,"HairColor")
+        end
+        if rainbow_char then           
+            game:GetService("ReplicatedStorage")["_CS.Events"].EquipAvatarItem:FireServer("Color",colorx,"SkinColor")            
+        end
+    end  
+end)
+
+Main:SelectPage(Main.pages[1], true)
+print("Finished Loading | 100%")
