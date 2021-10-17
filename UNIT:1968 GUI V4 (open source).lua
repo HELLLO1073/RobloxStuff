@@ -238,7 +238,7 @@ end)
 MiscSection2:addToggle("Chat Spammer", nil, function(state)
     chatSpammer = state
 end)
-MiscSection2:addDropdown("ChatSpammer Text", {"Custom", "Emoji", "KIDS", "Wack", "EZ", "H3LLL0"}, function(text)
+MiscSection2:addDropdown("ChatSpammer Text", {"Custom", "Emoji", "Wack", "EZ", "H3LLL0"}, function(text)
     chatSpammerOptions = text
 end)
 MiscSection2:addTextbox("Custom Text", "", function(value, focusLost)
@@ -306,9 +306,7 @@ coroutine.wrap(function()
                 if chatSpammerOptions == "Custom" then 
                     chatSpammerTxt = customChatSpammerText
                     else if chatSpammerOptions == "Emoji" then
-                        chatSpammerTxt = "😀😄😆😂🤣😏"
-                        else if chatSpammerOptions == "KIDS" then
-                            chatSpammerTxt = "H3LLL0-Scripts Making these KIDS mad?  " .. "|" .. emo .. "|" 
+                        chatSpammerTxt = "😀😄😆😂🤣😏"                        
                             else if chatSpammerOptions == "Wack" then
                                 chatSpammerTxt = "WaCk wAcK wAcK WacK WaCk WaCk wAcK wAcK WacK WaCk WaCk wAcK wAcK WacK WaCk WaCk wAcK wAcK WacK WaCk WaCk wAcK wAcK WacK WaCk WaCk wAcK wAcK WacK WaCk"
                                 else if chatSpammerOptions == "EZ" then
@@ -328,11 +326,10 @@ coroutine.wrap(function()
                                              l0l      H3LLL0 - SKripts     l0l
                                              l0l      H3LLL0 - SKripts     l0l
                                             ]]
-                                            end
                                         end
                                     end
-                                 end
-                            end
+                                end
+                            end                            
                         end
                     local b1 = false
                 local b2 = false            
