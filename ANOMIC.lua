@@ -32,10 +32,20 @@ local esp_Chams_Colour = Color3.fromRGB(200, 255, 0)
 local rainbow_char     = false
 local rainbow_hair     = false
 -- Player
+local camera   = game:GetService("Workspace").Camera
+local wLighting = game:GetService("Lighting")
+local wColorCorrection = false
 local Players  = game:GetService("Players")
 local LPlayer  = Players.LocalPlayer
-local camera   = game:GetService("Workspace").Camera
 local Hitboxes = false
+local CameraoffsetZ = 0
+local CameraoffsetY = 0
+local CameraoffsetX = 0
+local CameraOffset = false
+local clientMarkerModule = require(game.ReplicatedStorage.Client.Marker)
+local AutoHeal = false
+local flight = false
+
 local headHitboxSize = 5
 local charParts = {"Head","LeftHand","LeftLowerArm","LeftUpperArm","RightHand","RightLowerArm","RightUpperArm","UpperTorso","LowerTorso","RightFoot","RightLowerLeg","RightUpperLeg","LeftFoot","LeftLowerLeg","LeftUpperLeg"}
 -- Functions 
@@ -47,6 +57,9 @@ function notify(title, message)
     else
         require(game:GetService("ReplicatedStorage"):WaitForChild("Client").NotificationHandler):AddToStream(game.Players.LocalPlayer,title..": "..message)
     end
+end
+function purchaseItem(name)
+    game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").PurchaseTeamItem:FireServer(name,"Single",nil)
 end
 
 repeat wait() until LPlayer.Character.HumanoidRootPart.Anchored == false    
@@ -103,6 +116,82 @@ local PlrSection = PLa:addSection("Movement")
 PlrSection:addSlider("Player Fov", 50, 0, 170, function(valuex)
     camera.FieldOfView = valuex
 end)
+PlrSection:addToggle("God / AutoHeal", nil, function(v)
+    AutoHeal = v
+end)
+PlrSection:addToggle("Flight", nil, function(v)
+    local f = v
+    if f then
+        _G.FLYING = f
+        local LP = LPlayer
+        local T = LP.Character.UpperTorso
+        local CONTROL = {F = 0, B = 0, L = 0, R = 0}
+        local lCONTROL = {F = 0, B = 0, L = 0, R = 0}
+        local SPEED = 5
+        local MOUSE = LP:GetMouse()
+    
+        local function FLY()
+           _G.FLYING = true
+           local BG = Instance.new('BodyGyro', T)
+           local BV = Instance.new('BodyVelocity', T)
+           BG.P = 9e4
+           BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+           BG.cframe = T.CFrame
+           BV.velocity = Vector3.new(0, 0.1, 0)
+           BV.maxForce = Vector3.new(9e9, 9e9, 9e9)        
+           spawn(function()
+             repeat wait()
+               LP.Character.Humanoid.PlatformStand = true
+               if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 then
+                 SPEED = 50
+               elseif not (CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0) and SPEED ~= 0 then
+                 SPEED = 0
+               end
+               if (CONTROL.L + CONTROL.R) ~= 0 or (CONTROL.F + CONTROL.B) ~= 0 then
+                 BV.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (CONTROL.F + CONTROL.B)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(CONTROL.L + CONTROL.R, (CONTROL.F + CONTROL.B) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
+                 lCONTROL = {F = CONTROL.F, B = CONTROL.B, L = CONTROL.L, R = CONTROL.R}
+               elseif (CONTROL.L + CONTROL.R) == 0 and (CONTROL.F + CONTROL.B) == 0 and SPEED ~= 0 then
+                 BV.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (lCONTROL.F + lCONTROL.B)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lCONTROL.L + lCONTROL.R, (lCONTROL.F + lCONTROL.B) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
+               else
+                 BV.velocity = Vector3.new(0, 0.1, 0)
+               end
+               BG.cframe = game.Workspace.CurrentCamera.CoordinateFrame
+             until not _G.FLYING
+             CONTROL = {F = 0, B = 0, L = 0, R = 0}
+             lCONTROL = {F = 0, B = 0, L = 0, R = 0}
+             SPEED = 0
+             BG:destroy()
+             BV:destroy()
+             LP.Character.Humanoid.PlatformStand = false
+           end)
+         end     
+         MOUSE.KeyDown:connect(function(KEY)
+           if KEY:lower() == 'w' then
+             CONTROL.F = 1
+           elseif KEY:lower() == 's' then
+             CONTROL.B = -1
+           elseif KEY:lower() == 'a' then
+             CONTROL.L = -1
+           elseif KEY:lower() == 'd' then
+             CONTROL.R = 1
+           end
+         end)     
+         MOUSE.KeyUp:connect(function(KEY)
+           if KEY:lower() == 'w' then
+             CONTROL.F = 0
+           elseif KEY:lower() == 's' then
+             CONTROL.B = 0
+           elseif KEY:lower() == 'a' then
+             CONTROL.L = 0
+           elseif KEY:lower() == 'd' then
+             CONTROL.R = 0
+           end
+         end)    
+            FLY()
+        else
+        _G.FLYING = false
+     end
+end)
 local plrApp = PLa:addSection("Appearance")
 plrApp:addToggle("Outfit Editer", nil, function(v)
     LPlayer.PlayerGui.AvatarEditor.Enabled = v
@@ -119,14 +208,27 @@ end)
 plrApp:addToggle("Rainbow Hair", nil, function(v)
     rainbow_hair = v
 end)
+local plrSection = PLa:addSection("Camera Offset")
+plrSection:addToggle("Enabled", nil, function(state)
+    CameraOffset = state
+end)
+plrSection:addSlider("Camera offset Z", 0, 0, 20, function(valuex)
+    CameraoffsetZ = valuex
+end)
+plrSection:addSlider("Camera offset Y", 0, 0, 20, function(valuex)
+    CameraoffsetY = valuex
+end)
+plrSection:addSlider("Camera offset X", 0, 0, 20, function(valuex)
+    CameraoffsetX = valuex
+end)
 local teamSection = PLa:addSection("TeamChanger  (Cooldown)")
-teamSection:addDropdown("Team changer", {"Gunsmith", "Civilian", "Advanced Gunsmith", "Trucker", "Tow Trucker", "Secret Service", "Advanced Car Dealer", "Car Dealer","Deliverant", "Criminal", "Crafter", "Cab Driver", "Paramedic", "Mayor", "Military", "SWAT", "Sheriff"}, function(team)
+teamSection:addDropdown("Team changer", {"Gunsmith", "Civilian", "Crafter", "Advanced Gunsmith", "Trucker", "Tow Trucker", "Secret Service", "Advanced Car Dealer", "Car Dealer","Deliverant", "Criminal", "Crafter", "Cab Driver", "Paramedic", "Mayor", "Military", "SWAT", "Sheriff"}, function(team)
     game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").TeamChanger:FireServer(team)
 end)
 
 -- ESP Page
-local Esp = Main:addPage("Visuals", 5012544693)
-local EspSection = Esp:addSection("Visuals")
+local Esp = Main:addPage("ESP | Visuals", 5012544693)
+local EspSection = Esp:addSection("ESP")
 EspSection:addToggle("ESP Enabled", nil, function(v)
     esp_Enabled = v
 end)
@@ -157,6 +259,28 @@ end)
 EspSection2:addColorPicker("Chams Color", Color3.fromRGB(255, 0, 0), function(s)
     esp_Chams_Colour = s
 end)
+local wrldSection = Esp:addSection("Client World")
+wrldSection:addSlider("ClockTime", 0, 0, 23, function(valuex)
+    wLighting.ClockTime = valuex
+end)
+wrldSection:addSlider("Brightness", 1, 0, 25, function(valuex)
+    wLighting.Brightness = valuex
+end)
+wrldSection:addSlider("Exposure", 1, 0, 5, function(valuex)
+    wLighting.ExposureCompensation = valuex
+end)
+wrldSection:addToggle("Shadows", nil, function(state)
+    wLighting.GlobalShadows = state
+end)
+wrldSection:addToggle("Color Correction", nil, function(state)
+    wLighting.ColorCorrection.Enabled = state
+end)
+wrldSection:addColorPicker("Color Correction", Color3.fromRGB(255, 255, 255), function(s)    
+    wLighting.ColorCorrection.TintColor = s    
+end)
+wrldSection:addColorPicker("Ambient", Color3.fromRGB(150, 140, 140), function(s)    
+    wLighting.Ambient = s    
+end)
 
 local tele = Main:addPage("Teleportation", 5012544693)
 local teleSection = tele:addSection("Player")
@@ -165,14 +289,14 @@ teleSection:addTextbox("Target Name", "Default", function(plr)
     print(plr)
     targetName = plr
 end)
-teleSection:addButton("Teleport", function()
+teleSection:addButton("Teleport to target", function()
     for i,v in pairs(game:service'Players':GetPlayers()) do
         if v.Name:match(targetName) then
             LPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,2,0)
         end
     end
 end)
-local teleSection2 = tele:addSection("Locations")
+local teleSection2 = tele:addSection("Location Teleport")
 teleSection2:addButton("Arway", function()
     LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1861.14111, -65.5734253, -1310.6853, 0.998740196, 0, -0.0501802117, 0, 1, 0, 0.0501802117, 0, 0.998740196)
 end)
@@ -207,9 +331,12 @@ teleSection2:addButton("Safe Spot 3", function()
     LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1370.47009, 71.7390747, 1057.67322, -0.805606365, 3.60798893e-08, -0.592451155, 9.24334884e-08, 1, -6.47903775e-08, 0.592451155, -1.06957877e-07, -0.805606365)
 end)
 
-
 local misc = Main:addPage("Miscellaneous", 5012544693)
+local miscSection0 = misc:addSection("Discord")
 local miscSection = misc:addSection("Misc")
+miscSection0:addButton("Copy discord link", function()
+    setclipboard([[https://discord.gg/chBXmh2C4Q]])
+end)
 miscSection:addButton("Unlock cars (LOOP)", function() 
     while wait(3) do
         for i,v in pairs(game:GetService("Workspace").PlayerVehicles:GetDescendants()) do
@@ -220,7 +347,33 @@ miscSection:addButton("Unlock cars (LOOP)", function()
         end
     end
 end)
+miscSection:addToggle("Mark all atm's", nil, function(state)
+    if state then
+        clientMarkerModule:MarkAllATMs();
+    else 
+        clientMarkerModule:DeleteATMMarkings();
+    end
+end)
 
+local boomSection = misc:addSection("BoomBox player (Hold Boombox")
+boomSection:addButton("Among us Drip", function() 
+    game:GetService("Players").LocalPlayer.Character.Boombox.ToolModel.PlayMusicEvent:FireServer("Play","http://www.roblox.com/asset/?id=6065418936")
+end)
+boomSection:addButton("Rick & Morty", function() 
+    game:GetService("Players").LocalPlayer.Character.Boombox.ToolModel.PlayMusicEvent:FireServer("Play","http://www.roblox.com/asset/?id=7009577773")
+end)
+boomSection:addButton("Gangsters Paridise", function() 
+    game:GetService("Players").LocalPlayer.Character.Boombox.ToolModel.PlayMusicEvent:FireServer("Play","http://www.roblox.com/asset/?id=4710724900")
+end)
+boomSection:addButton("Moonlight", function() 
+    game:GetService("Players").LocalPlayer.Character.Boombox.ToolModel.PlayMusicEvent:FireServer("Play","http://www.roblox.com/asset/?id=2924787912")
+end)
+boomSection:addButton("Righteous", function() 
+    game:GetService("Players").LocalPlayer.Character.Boombox.ToolModel.PlayMusicEvent:FireServer("Play","http://www.roblox.com/asset/?id=4588756335")
+end)
+boomSection:addButton("Screaming", function() 
+    game:GetService("Players").LocalPlayer.Character.Boombox.ToolModel.PlayMusicEvent:FireServer("Play","http://www.roblox.com/asset/?id=271550300")
+end)
 print("Loading | 30%")
 
 local Ui = Main:addPage("UI", 5012544693)
@@ -434,7 +587,19 @@ game:GetService("RunService").RenderStepped:connect(function()
                 end
             end                       
         end
-    end      
+    end  
+    if LPlayer.Character.Humanoid.Health < 70 and AutoHeal then        
+        if not LPlayer.Backpack:FindFirstChild("Medi Kit") then
+            purchaseItem("Medi Kit")         
+        else                     
+            for _, t in ipairs(LPlayer.Backpack:GetChildren()) do
+                if t:IsA("Tool") and t.Name == "Medi Kit" then          
+                    LPlayer.Character.Humanoid:EquipTool(t)            
+                    game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").ToolEvent:FireServer("Heal",LPlayer.Character, t)  
+                end
+            end
+        end
+    end    
     if rainbow_hair or rainbow_char then      
         local colorx = Color3.fromHSV(zigzag(c),1,1)
         c = c + .001
@@ -445,6 +610,9 @@ game:GetService("RunService").RenderStepped:connect(function()
             game:GetService("ReplicatedStorage")["_CS.Events"].EquipAvatarItem:FireServer("Color",colorx,"SkinColor")            
         end
     end  
+    if CameraOffset then 
+        game.Workspace.CurrentCamera.CFrame = game.Workspace.CurrentCamera.CFrame * CFrame.new(CameraoffsetX,CameraoffsetY,CameraoffsetZ)
+    end
 end)
 
 Main:SelectPage(Main.pages[1], true)
