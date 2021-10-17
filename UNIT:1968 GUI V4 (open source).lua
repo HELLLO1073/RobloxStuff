@@ -11,9 +11,6 @@ local themes =
     DarkContrast = Color3.fromRGB(14, 14, 14),  
     TextColor = Color3.fromRGB(255, 255, 255)
 }
-
-
-
 --#vars
 local Character_Parts ={ "Head","LeftHand","LeftLowerArm","LeftUpperArm","RightHand","RightLowerArm","RightUpperArm","UpperTorso","LowerTorso","RightFoot","RightLowerLeg","RightUpperLeg","LeftFoot","LeftLowerLeg","LeftUpperLeg"}
 --ESP
@@ -217,9 +214,13 @@ end)
 
 
 local MiscPage = Main:addPage("Miscellaneous", 5012544693)
+local MiscSection0 = MiscPage:addSection("Discord")
 local MiscSection = MiscPage:addSection("Visuals")
 local MiscSection2 = MiscPage:addSection("Players")
 local MiscSection3 = MiscPage:addSection("Team Changer")
+MiscSection0:addButton("Copy discord link", function()
+    setclipboard([[https://discord.gg/chBXmh2C4Q]])
+end)
 MiscSection:addToggle("Rainbow Gun", nil, function(state)
     RGBGun = state
 end)
