@@ -59,7 +59,15 @@ local RenderPlayer = false
 local CameraoffsetX = 0
 local CameraoffsetY = 0
 local CameraoffsetZ = 0
-
+local chatSpammer = false
+local chatSpammerOptions = nil
+local teamEvent = "changeteam"
+local teamOption = nil
+local chatSpammerText = ""
+local customChatSpammerText = ""
+local myEmojojies = { '🤣', '😈', '😭', '🙃', '👽'}
+local Health_Spam = false
+local Ammo_Spam = false
 --Other
 local XLighting = game.GetService(game, "Lighting") 
 local Players = game:GetService("Players")
@@ -211,6 +219,7 @@ end)
 local MiscPage = Main:addPage("Miscellaneous", 5012544693)
 local MiscSection = MiscPage:addSection("Visuals")
 local MiscSection2 = MiscPage:addSection("Players")
+local MiscSection3 = MiscPage:addSection("Team Changer")
 MiscSection:addToggle("Rainbow Gun", nil, function(state)
     RGBGun = state
 end)
@@ -219,6 +228,25 @@ MiscSection:addDropdown("RGB Material", {"ForceField", "Glass", "Neon", "Plastic
 end)
 MiscSection2:addToggle("Whizz annoy all", nil, function(state)
     WhizzerEnabled = state
+end)
+MiscSection2:addToggle("Mass Ammo bags", nil, function(state)
+    Ammo_Spam = state
+end)
+MiscSection2:addToggle("Mass Health bags", nil, function(state)
+    Health_Spam = state
+end)
+MiscSection2:addToggle("Chat Spammer", nil, function(state)
+    chatSpammer = state
+end)
+MiscSection2:addDropdown("ChatSpammer Text", {"Custom", "Emoji", "KIDS", "Wack", "EZ", "H3LLL0"}, function(text)
+    chatSpammerOptions = text
+end)
+MiscSection2:addTextbox("Custom Text", "", function(value, focusLost)
+    customChatSpammerText = value
+end)
+MiscSection3:addDropdown("Team Option", {"NV", "USA","None"}, function(teamx)
+    local args = {[1] = {[1] = "changeteam",[2] = teamx}}
+    game:GetService("ReplicatedStorage").Events.RemoteEvent:FireServer(unpack(args))
 end)
 
 local WorldPage = Main:addPage("Client World", 5012544693)
@@ -258,6 +286,61 @@ end
 
 print("Loading | %50")
 --Main
+coroutine.wrap(function()
+    while wait() do
+        pcall(function()
+            if Health_Spam then
+                game:GetService("ReplicatedStorage").Events.ThrowHP:FireServer()
+            end
+            if Ammo_Spam then
+                game:GetService("ReplicatedStorage").Events.ThrowAmmo:FireServer()
+            end
+        end)
+    end
+end)()
+coroutine.wrap(function()
+    while wait() do
+        pcall(function()
+            if chatSpammer then   
+                local emo = myEmojojies[math.random(#myEmojojies)]
+                if chatSpammerOptions == "Custom" then 
+                    chatSpammerTxt = customChatSpammerText
+                    else if chatSpammerOptions == "Emoji" then
+                        chatSpammerTxt = "😀😄😆😂🤣😏"
+                        else if chatSpammerOptions == "KIDS" then
+                            chatSpammerTxt = "H3LLL0-Scripts Making these KIDS mad?  " .. "|" .. emo .. "|" 
+                            else if chatSpammerOptions == "Wack" then
+                                chatSpammerTxt = "WaCk wAcK wAcK WacK WaCk WaCk wAcK wAcK WacK WaCk WaCk wAcK wAcK WacK WaCk WaCk wAcK wAcK WacK WaCk WaCk wAcK wAcK WacK WaCk WaCk wAcK wAcK WacK WaCk"
+                                else if chatSpammerOptions == "EZ" then
+                                    chatSpammerTxt = "|           EZ          |" 
+                                        else if chatSpammerOptions == "H3LLL0" then
+                                            chatSpammerTxt = 
+                                            [[
+                                             l0l      H3LLL0 - SKripts     l0l
+                                             l0l      H3LLL0 - SKripts     l0l
+                                             l0l      H3LLL0 - SKripts     l0l
+                                             l0l      H3LLL0 - SKripts     l0l
+                                             l0l      H3LLL0 - SKripts     l0l
+                                             l0l      H3LLL0 - SKripts     l0l
+                                             l0l      H3LLL0 - SKripts     l0l
+                                             l0l      H3LLL0 - SKripts     l0l
+                                             l0l      H3LLL0 - SKripts     l0l
+                                             l0l      H3LLL0 - SKripts     l0l
+                                             l0l      H3LLL0 - SKripts     l0l
+                                            ]]
+                                            end
+                                        end
+                                    end
+                                 end
+                            end
+                        end
+                    local b1 = false
+                local b2 = false            
+                game:GetService("ReplicatedStorage").Events.Chat:FireServer(chatSpammerTxt,b1,b2)       
+            end
+        end)
+    end
+end)()
 coroutine.wrap(function()
     while wait(.09)do
         pcall(function()
