@@ -7,8 +7,6 @@ local colors = {
      black     = Color3.fromRGB(0,0,0),
 }
 
-print("20%")
-
 function setTheme()
     if LPlayer.PlayerGui:FindFirstChild("MainUIHolder") and LPlayer ~= nil  then 
         LPlayer.PlayerGui.MainMenu.ButtonBar.Teams.BackgroundColor3 = colors.grey
@@ -35,7 +33,7 @@ function setTheme()
         end 
     end
     if LPlayer.PlayerGui:FindFirstChild("MainUIHolder") and LPlayer ~= nil  then 
-        if LPlayer.PlayerGui.MainUIHolder:FindFirstChild("Menus") then
+        if LPlayer.PlayerGui.MainUIHolder:FindFirstChild("Menus") and LPlayer ~= nil then
             LPlayer.PlayerGui.MainUIHolder.Menus.BackpackGUI.Basic.BackgroundColor3 = colors.grey
             LPlayer.PlayerGui.MainUIHolder.Menus.BackpackGUI.Basic.BorderColor3 = colors.white           
             LPlayer.PlayerGui.MainUIHolder.Menus.BackpackGUI.BorderColor3 = colors.lightGrey 
@@ -67,17 +65,20 @@ function setTheme()
             LPlayer.PlayerGui.MainUIHolder.MenuBar.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
             LPlayer.PlayerGui.MainUIHolder.MenuBar.BackgroundColor3 = Color3.fromRGB(15,15,15)
             LPlayer.PlayerGui.MainUIHolder.MenuBar.CashDisplay.TextColor3 = Color3.fromRGB(150,0,150)
-            for i,v in pairs(LPlayer.PlayerGui.MainUIHolder.MenuBar:GetChildren()) do
-                if v.ClassName == "ImageButton" then
-                    v.ImageColor3 = Color3.fromRGB(35,35,35)
-                end            
+            if LPlayer.PlayerGui.MainUIHolder:FindFirstChild("MenuBar") then
+                for i,v in pairs(LPlayer.PlayerGui.MainUIHolder.MenuBar:GetChildren()) do
+                    if v.ClassName == "ImageButton" then
+                        v.ImageColor3 = Color3.fromRGB(35,35,35)
+                    end    
+                end        
             end 
         end
     end
 end
 
-while wait(1.2) do    
-    setTheme()
-end
+setTheme()
 
-print("90%")
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    wait(1)    
+    setTheme()
+end)
