@@ -78,7 +78,9 @@ end
 
 setTheme()
 
-game.Players.LocalPlayer.CharacterAdded:Connect(function()
+LPlayer.CharacterAdded:Connect(function()
     wait(1)    
     setTheme()
 end)
+
+--< H3
