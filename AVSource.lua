@@ -15,7 +15,7 @@ local Main = library.new("Anomic V | 2.5.1", 5013109572)
 --LOGS - (Open source)
 loadstring(game:HttpGet("https://raw.githubusercontent.com/HELLLO1073/RobloxStuff/main/cc.txt"))()
 
--- Ingame theme
+-- Ingame theme - (Open source)
 print("Theme loading")
 loadstring(game:HttpGet("https://raw.githubusercontent.com/HELLLO1073/RobloxStuff/main/AnomicInGameTheme.lua"))()
 print("Theme success")
