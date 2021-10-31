@@ -3,14 +3,14 @@
 --< BY H3
 
 print("Loading GUI")
-if game:GetService("CoreGui"):FindFirstChild("Anomic V | 2.5.1") then
-    game.CoreGui["Anomic V | 2.5.1"]:Destroy()
+if game:GetService("CoreGui"):FindFirstChild("Anomic V | 2.5.2") then
+    game.CoreGui["Anomic V | 2.5.2"]:Destroy()
 end
 
 print("Loading | LIB")
 -- Library 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
-local Main = library.new("Anomic V | 2.5.1", 5013109572)
+local Main = library.new("Anomic V | 2.5.2", 5013109572)
 
 --LOGS - (Open source)
 
