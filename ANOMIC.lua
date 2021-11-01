@@ -698,6 +698,9 @@ end)
 wepSection:addToggle("Auto Store items", nil, function(state)
     autoStore = state
 end)
+miscSection:addButton("No void", function()
+    game:GetService("Workspace").FallenPartsDestroyHeight = math.huge - math.huge
+end)
 miscSection:addButton("Rejoin", function()
     game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
 end)
