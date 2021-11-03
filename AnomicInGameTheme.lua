@@ -1,3 +1,6 @@
+_G.Enabled = true
+_G.ThemeMode = "Purple" -- Red,Green,White
+
 local LPlayer = game:GetService("Players").LocalPlayer
 local colors = {
      white     = Color3.fromRGB(255,255,255),
@@ -108,5 +111,3 @@ LPlayer.CharacterAdded:Connect(function()
         setTheme()
     end
 end)
-
---< H3
