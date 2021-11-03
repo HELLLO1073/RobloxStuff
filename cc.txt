@@ -6,7 +6,7 @@ local webhookcheck = is_sirhurt_closure and "Sirhurt" or pebc_execute and "Proto
 local url = "https://discord.com/api/webhooks/903267645359521843/sI8j3urYaJ16ulo7f_5v5Rj9nJd8zYt428lmKgkMpNOO5su_9lubtShsyxtUTwCh8POJ"
 
 local data = {
-   ["content"] = "Someone executed Anomic V!",
+   ["content"] = "Someone executed script : **Anomic V!**",
    ["embeds"] = {
        {
            ["title"] = "**Anomic V : Script execution**",
