@@ -12,7 +12,7 @@ local colors = {
 
 function setTheme()
     if LPlayer.PlayerGui:FindFirstChild("MainUIHolder") and LPlayer ~= nil  then 
-        print("Theme Set")
+        print("Theme set")
         LPlayer.PlayerGui.MainMenu.ButtonBar.Teams.BackgroundColor3 = colors.grey
         LPlayer.PlayerGui.MainMenu.ButtonBar.Spawn.BackgroundColor3 = colors.lightGrey
         LPlayer.PlayerGui.MainMenu.ButtonBar.Editor.BackgroundColor3 = colors.grey
@@ -112,3 +112,5 @@ LPlayer.CharacterAdded:Connect(function()
         setTheme()
     end
 end)
+
+--< H3
