@@ -28,12 +28,7 @@ local data = {
 					["name"] = "**User Id**",
 					["value"] = LPlayer.UserId,
 					["inline"] = true
-				},
-				{
-					["name"] = ".",
-					["value"] = ".",
-					["inline"] = true
-				},
+				},				
 				{
 					["name"] = "**Display Name**",
 					["value"] = LPlayer.DisplayName,
