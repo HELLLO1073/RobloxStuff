@@ -1,10 +1,10 @@
 local LPlayer = game:GetService("Players").LocalPlayer
-
 local colors = {
      white     = Color3.fromRGB(255,255,255),
      lightGrey = Color3.fromRGB(70,70,70),
      grey      = Color3.fromRGB(50,50,50),
-     black     = Color3.fromRGB(0,0,0),
+     black     = Color3.fromRGB(0,0,0),     
+     stamBar   = Color3.fromRGB(250,20,100),     
 }
 
 function setTheme()
@@ -57,14 +57,38 @@ function setTheme()
             LPlayer.PlayerGui.MainUIHolder.StaminaBar.BackgroundColor3 = colors.grey
             LPlayer.PlayerGui.MainUIHolder.MessageBar.BackgroundColor3 = colors.grey
             LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.BackgroundColor3 = colors.black
-            LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.Bar.BackgroundColor3 = Color3.fromRGB(250,20,100)
             LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.StatNum.TextColor3 = Color3.fromRGB(255,255,255)
             LPlayer.PlayerGui.MainUIHolder.PhoneBar.Phone.ImageColor3 = Color3.fromRGB(30,30,30)
             LPlayer.PlayerGui.MainUIHolder.PhoneBar.Phone.Exlam.TextColor3 = colors.white
             LPlayer.PlayerGui.MainUIHolder.MenuBar.ImageLabel.BackgroundColor3 = colors.black
             LPlayer.PlayerGui.MainUIHolder.MenuBar.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
             LPlayer.PlayerGui.MainUIHolder.MenuBar.BackgroundColor3 = Color3.fromRGB(15,15,15)
-            LPlayer.PlayerGui.MainUIHolder.MenuBar.CashDisplay.TextColor3 = Color3.fromRGB(150,0,150)
+
+            if _G.ThemeMode == "Purple" then
+                LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.Bar.BackgroundColor3 = Color3.fromRGB(255, 29, 108) -- Stam
+                else if _G.ThemeMode == "Red" then
+                    LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.Bar.BackgroundColor3 = Color3.fromRGB(199, 0, 0) -- Stam
+                    else if _G.ThemeMode == "Green" then
+                        LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.Bar.BackgroundColor3 = Color3.fromRGB(41, 206, 0) -- Stam
+                        else if _G.ThemeMode == "White" then
+                            LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.Bar.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Stam
+                        end
+                    end
+                end
+            end
+            if _G.ThemeMode == "Purple" then
+                LPlayer.PlayerGui.MainUIHolder.MenuBar.CashDisplay.TextColor3 = Color3.fromRGB(150,0,150) -- Cash
+                else if _G.ThemeMode == "Red" then
+                    LPlayer.PlayerGui.MainUIHolder.MenuBar.CashDisplay.TextColor3 = Color3.fromRGB(201, 0, 0) -- Cash
+                    else if _G.ThemeMode == "Green" then
+                        LPlayer.PlayerGui.MainUIHolder.MenuBar.CashDisplay.TextColor3 = Color3.fromRGB(93, 233, 0) -- Cash
+                        else if _G.ThemeMode == "White" then
+                            LPlayer.PlayerGui.MainUIHolder.MenuBar.CashDisplay.TextColor3 = Color3.fromRGB(255, 255, 255) -- Cash
+                        end
+                    end
+                end
+            end
+
             if LPlayer.PlayerGui.MainUIHolder:FindFirstChild("MenuBar") then
                 for i,v in pairs(LPlayer.PlayerGui.MainUIHolder.MenuBar:GetChildren()) do
                     if v.ClassName == "ImageButton" then
@@ -79,8 +103,10 @@ end
 setTheme()
 
 LPlayer.CharacterAdded:Connect(function()
-    wait(1)    
-    setTheme()
+    if _G.Enabled then
+        wait(1)    
+        setTheme()
+    end
 end)
 
 --< H3
