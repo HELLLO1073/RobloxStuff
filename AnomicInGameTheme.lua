@@ -1,5 +1,5 @@
---[[_G.Enabled = true
-_G.ThemeMode = "Purple" -- Red,Green,White]]
+_G.Enabled = true
+_G.ThemeMode = "Purple" -- Red,Green,White
 
 local LPlayer = game:GetService("Players").LocalPlayer
 local colors = {
@@ -11,6 +11,7 @@ local colors = {
 }
 
 function setTheme()
+     print("Theme set 1")
     if LPlayer.PlayerGui:FindFirstChild("MainUIHolder") and LPlayer ~= nil  then 
         LPlayer.PlayerGui.MainMenu.ButtonBar.Teams.BackgroundColor3 = colors.grey
         LPlayer.PlayerGui.MainMenu.ButtonBar.Spawn.BackgroundColor3 = colors.lightGrey
