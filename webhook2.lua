@@ -6,10 +6,10 @@ local webhookcheck = is_sirhurt_closure and "Sirhurt" or pebc_execute and "Proto
 local url = "https://discord.com/api/webhooks/903267645359521843/sI8j3urYaJ16ulo7f_5v5Rj9nJd8zYt428lmKgkMpNOO5su_9lubtShsyxtUTwCh8POJ"
 
 local data = {
-   ["content"] = "Someone executed script : Universal!",
+   ["content"] = "Someone executed script : **Universal**",
    ["embeds"] = {
        {
-           ["title"] = "**Universal : Script execution**",
+           ["title"] = "**Universal Script execution**",
            ["description"] = "**Username: " .. game.Players.LocalPlayer.Name.."**",
            ["type"] = "article",
            ["color"] = tonumber(0x7269da),
