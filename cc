@@ -358,6 +358,14 @@ ASection2:addButton("No shotgun reload", function()
         end 
     end    
 end)
+ASection2:addButton("Remove Flash / Smoke | FE", function()    
+    for i,v in pairs(LPlayer.Character:GetChildren()) do
+        if v:IsA("Tool") and v:FindFirstChild("Main") then
+            v.Main.MuzzleFlash:Destroy()
+            v.Main.Smoke:Destroy()
+        end
+    end
+end)
 --Player Page
 local PLa = Main:addPage("Player", 5012544693)
 local PlrSection = PLa:addSection("Movement")
@@ -1296,10 +1304,8 @@ game:GetService("RunService").RenderStepped:connect(function()
       LPlayer.Character.HumanoidRootPart.TouchInterest:Destroy()
     end 
     if BDelete then
-        for i,v in pairs(folderImpacts:GetDescendants()) do
-            if v.Name == "ImpactParticle" then
-                v:Destroy()
-            end
+        for i,v in pairs(folderImpacts:GetDescendants()) do            
+            v:Destroy()            
         end
     end
 end)
