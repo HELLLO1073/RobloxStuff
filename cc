@@ -511,33 +511,39 @@ end)
 plrApp:addToggle("Rainbow Hair", nil, function(v)
     rainbow_hair = v
 end)
-plrApp:addButton("Glitch player" ,function()   
+PlrSection:addDropdown("Player Glitch", {"Small", "Larger", }, function(x)
     local H = LPlayer.Character:FindFirstChildWhichIsA('Humanoid')
-    local function DeleteOriginal()
-        for i,v in pairs(LPlayer.Character:GetDescendants()) do
-            if v.Name == 'OriginalSize' then
-                v:Destroy()
+    if x == "Small" then
+        local function DeleteOriginal()
+            for i,v in pairs(LPlayer.Character:GetDescendants()) do
+                if v.Name == 'OriginalSize' then
+                    v:Destroy()
+                end            
             end
-            if v.Name == 'OriginalPosition' then 
+        end       
+        wait(.8)
+        DeleteOriginal()
+        H:FindFirstChild("BodyDepthScale"):Destroy()    
+        wait(.8)
+        DeleteOriginal()
+        H:FindFirstChild("BodyTypeScale"):Destroy()          
+        wait(.8) 
+        DeleteOriginal()
+        H:FindFirstChild("BodyProportionScale"):Destroy()   
+        wait(.8)
+        DeleteOriginal()
+        H:FindFirstChild("HeadScale"):Destroy() 
+        wait(.8)
+        DeleteOriginal()
+        H:FindFirstChild("BodyWidthScale"):Destroy()  
+    else
+        for i,v in pairs(LPlayer.Character.Humanoid:GetChildren()) do
+            if string.find(v.Name,"Scale") then        
                 v:Destroy()
+                wait(1)          
             end
-        end
-    end       
-    wait(.8)
-    DeleteOriginal()
-    H:FindFirstChild("BodyDepthScale"):Destroy()    
-    wait(.8)
-    DeleteOriginal()
-    H:FindFirstChild("BodyTypeScale"):Destroy()          
-    wait(.8) 
-    DeleteOriginal()
-    H:FindFirstChild("BodyProportionScale"):Destroy()   
-    wait(.8)
-    DeleteOriginal()
-    H:FindFirstChild("HeadScale"):Destroy() 
-    wait(.8)
-    DeleteOriginal()
-    H:FindFirstChild("BodyWidthScale"):Destroy()  
+        end        
+    end
 end)
 plrApp:addButton("Respawn" ,function()   
    game:GetService("ReplicatedStorage")["_CS.Events"].PayLoad:FireServer()
