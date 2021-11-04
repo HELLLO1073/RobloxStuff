@@ -1,5 +1,5 @@
 print("Loading GUI")
-local mainName = "Anomic V | 2.6.0"
+local mainName = "Anomic V | 2.6.5"
 
 if game:GetService("CoreGui"):FindFirstChild(mainName) then
     game.CoreGui[mainName]:Destroy()
@@ -77,6 +77,7 @@ local infiniteJump = false
 local gunSoundSpam = false
 local shotgunMod1 = false
 local shotgunMod2 = false
+local Rmod = false
 local speedBypass = false
 local headHitboxSize = 5
 local autoStore = false
@@ -126,7 +127,12 @@ local function bypass()
                     end
                     if shotgunMod2 and tostring(self) == "RayDrawer" then                        
                         return nil
-                    end
+                    end                    
+                end
+                if tostring(method) == "Fire" then
+                    if Rmod and tostring(self) == "ShootAnim" then
+                        return nil
+                    end                   
                 end
             return namecall(self,...)
         end
@@ -299,7 +305,8 @@ print("Loading | 15%")
 -- Combat Section
 local combS = Main:addPage("Main", 5012544693)
 local ASection1 = combS:addSection("Head Hitboxes")
-local ASection2 = combS:addSection("Weapon Mods")
+local ASection2 = combS:addSection("Shotgun Mods")
+local ASection22 = combS:addSection("Other Mods")
 ASection1:addToggle("Head hitboxes", nil, function(v)
     Hitboxes = v
 end)
@@ -328,10 +335,21 @@ ASection2:addDropdown("Rapid Mode", {"Maximum", "Medium", "Low"}, function(x)
         end
     end
 end)
-ASection2:addToggle("No-Smoke", nil, function(x)   
+ASection2:addButton("No shotgun reload", function()    
+    for i, v in pairs(itemList) do
+        if v.DataType == "RangedWeapon" and v.Firemode == "Shot" then                         
+            v.ReloadTime = 0.01                       
+        end 
+    end    
+end)
+ASection22:addToggle("No Impacts", nil, function(x)   
     BDelete = x        
 end)
-ASection2:addToggle("Gun Silencer", nil, function(x)   
+ASection22:addToggle("No visual recoil", nil, function(x)   
+    Rmod = x
+    bypass()
+end)
+ASection22:addToggle("Gun Silencer", nil, function(x)   
     for i,v in pairs(LPlayer.Character:GetChildren()) do
         if v:IsA("Tool") and v ~= nil then
             if v.Handle:FindFirstChild("ReloadSound") then
@@ -348,17 +366,10 @@ ASection2:addToggle("Gun Silencer", nil, function(x)
         end
     end    
 end)
-ASection2:addToggle("Gun Sound Spam", nil, function(x)   
+ASection22:addToggle("Gun Sound Spam", nil, function(x)   
     gunSoundSpam = x
 end)
-ASection2:addButton("No shotgun reload", function()    
-    for i, v in pairs(itemList) do
-        if v.DataType == "RangedWeapon" and v.Firemode == "Shot" then                         
-            v.ReloadTime = 0.01                       
-        end 
-    end    
-end)
-ASection2:addButton("Remove Flash / Smoke | FE", function()    
+ASection22:addButton("Remove Flash / Smoke | FE", function()    
     for i,v in pairs(LPlayer.Character:GetChildren()) do
         if v:IsA("Tool") and v:FindFirstChild("Main") then
             v.Main.MuzzleFlash:Destroy()
