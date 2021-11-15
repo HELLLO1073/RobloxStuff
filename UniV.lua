@@ -170,8 +170,8 @@ game:GetService("RunService").RenderStepped:connect(function()
             if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("Humanoid").Health > 0 and v ~= LPlayer then
             local part = v.Character.HumanoidRootPart         
             local distance = LPlayer:DistanceFromCharacter(v.Character.HumanoidRootPart.Position)              
-            local Vector, os = game.Workspace.CurrentCamera:WorldToViewportPoint(part.Position)
-                if os then
+            local Vector ,b=game.Workspace.CurrentCamera:WorldToViewportPoint(part.Position)
+                if b then
                     if esp_Names then
                         local a=Drawing.new("Text")                        
                         if esp_distance then                
