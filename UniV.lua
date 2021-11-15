@@ -12,6 +12,7 @@ local winMain = Main:New({
 print("Loading | Vars 20%")
 local Character_Parts ={ "Head","LeftHand","LeftLowerArm","LeftUpperArm","RightHand","RightLowerArm","RightUpperArm","UpperTorso","LowerTorso","RightFoot","RightLowerLeg","RightUpperLeg","LeftFoot","LeftLowerLeg","LeftUpperLeg"}
 local camera = game:GetService("Workspace").CurrentCamera
+local lighting = game:GetService("Lighting")
 local players = game:GetService("Players")
 local LPlayer = players.LocalPlayer
 local mouse = LPlayer:GetMouse()
@@ -38,11 +39,26 @@ local hitboxType = "Head"
 local movementMods = false
 local xwalkSpeed = 16
 local xjumpPower = 45
+
 print("Loading | Tabs 50%")
 
+--Main | Combat
 local mainTab = winMain:Tab("Main")
 local mainSec = mainTab:Section("Hitbox Changer")
 
+--Player
+local plrTab = winMain:Tab("Player")
+local plrSec = plrTab:Section("Player Main")
+
+--ESP
+local espTab = winMain:Tab("ESP")
+local espSec = espTab:Section("ESP Main")
+
+--Visuals
+local visualsTab = winMain:Tab("Visuals")
+local visual_sec = visualsTab:Section("World")
+
+--<Hitboxes
 mainSec:Toggle("Hitboxes", false,"Toggle", function(t)
     hitboxes = t
 end)
@@ -61,9 +77,7 @@ end)
 mainSec:Slider("RootPart Size", 0,55,1,1,"Slider", function(s)
 	rootHitboxSize = s
 end)
-
-local plrTab = winMain:Tab("Player")
-local plrSec = plrTab:Section("Player Main")
+--<Player
 plrSec:Toggle("Movement overide", false,"Toggle", function(t)
     movementMods = t
 end)
@@ -73,9 +87,7 @@ end)
 plrSec:Slider("JumpPower", 0,100,45,0.1,"Slider", function(s)
 	xjumpPower = s
 end)
-
-local espTab = winMain:Tab("ESP | Visuals")
-local espSec = espTab:Section("ESP Main")
+--<ESP
 espSec:Toggle("ESP Enabled", false,"Toggle", function(t)
     esp_enabled = t
 end)
@@ -102,6 +114,28 @@ espSec:Colorpicker("ESP Color", Color3.fromRGB(255,255,255),"Colorpicker", funct
 end)
 espSec:Slider("Chams Transparency", 0,1,0.7,0.05,"Slider", function(s)
 	esp_chams_trans = s
+end)
+--<Wrld
+visual_sec:Toggle("World Shadows", lighting.GlobalShadows,"Toggle", function(t)
+    lighting.GlobalShadows = t
+end)
+visual_sec:Slider("Brightness", 0,20,math.ceil(lighting.Brightness),0.1,"Slider", function(s)
+	lighting.Brightness = s
+end)
+visual_sec:Slider("ExposureCompensation", 0,10,lighting.ExposureCompensation,0.1,"Slider", function(s)
+	lighting.ExposureCompensation = s
+end)
+visual_sec:Slider("Clock Time", 0,23,math.ceil(lighting.ClockTime),0.05,"Slider", function(s)
+	lighting.ClockTime = s
+end)
+visual_sec:Colorpicker("Fog Color", lighting.FogColor,"Colorpicker", function(c)
+	lighting.FogColor = c
+end)
+visual_sec:Colorpicker("World Aimbient", lighting.Ambient,"Colorpicker", function(c)
+	lighting.Ambient = c
+end)
+visual_sec:Colorpicker("Outdoor Aimbient", lighting.OutdoorAmbient,"Colorpicker", function(c)
+	lighting.OutdoorAmbient = c
 end)
 
 print("Loading | Main 70%")
