@@ -1,4 +1,5 @@
 --Island Royale
+--Beware this code down below is old and un-optimized.
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
 local Main = library.new("Island Royale V2 | H3LLLO", 5013109572)
