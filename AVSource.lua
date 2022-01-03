@@ -2,6 +2,8 @@
 --< ANOMIC V SOURCE
 --< BY H3
 
+--< Shit code down below, Have fun..
+
 print("Loading GUI")
 if game:GetService("CoreGui"):FindFirstChild("Anomic V | 2.5.1") then
     game.CoreGui["Anomic V | 2.5.1"]:Destroy()
@@ -13,7 +15,7 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Green
 local Main = library.new("Anomic V | 2.5.1", 5013109572)
 
 --LOGS - (Open source)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/HELLLO1073/RobloxStuff/main/cc.txt"))()
+--loadstring(game:HttpGet("https://raw.githubusercontent.com/HELLLO1073/RobloxStuff/main/cc.txt"))()
 
 -- Ingame theme - (Open source)
 print("Theme loading")
@@ -21,24 +23,6 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/HELLLO1073/RobloxStuf
 print("Theme success")
 
 print("Loading | R")
-if syn then
-    syn.request({
-        Url = "http://127.0.0.1:6463/rpc?v=1",
-        Method = "POST",
-        Headers = {
-        ["Content-Type"] = "application/json",
-        ["Origin"] = "https://discord.com"
-    },
-    print("Loading | R 50%");
-    Body = game:GetService("HttpService"):JSONEncode({
-        cmd = "INVITE_BROWSER",
-        args = {
-            code = "chBXmh2C4Q"
-        },
-            nonce = game:GetService("HttpService"):GenerateGUID(false)
-        }),
-    })
-end
 
 local chatSettings = require(game:GetService("Chat").ClientChatModules.ChatSettings)
 local chatFrame = game:GetService("Players").LocalPlayer.PlayerGui.Chat.Frame
