@@ -1,5 +1,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 
+--< Beware this code down below is old and very un-optimized...
+
 local colors = 
 {
     SchemeColor = Color3.fromRGB(255, 0, 0),
@@ -10,17 +12,6 @@ local colors =
 }
 
 local Window = Library.CreateLib("Unit 1968 | H3LLL0 - V:4", colors)
---[[ 
-    [THEMES]
-    LightTheme
-    DarkTheme
-    GrapeTheme
-    BloodTheme
-    Ocean
-    Midnight
-    Sentinel
-    Synapse
-]]
 print("Loading 1%")
 --#vars
 local ClientPlayer = game.Players.LocalPlayer
