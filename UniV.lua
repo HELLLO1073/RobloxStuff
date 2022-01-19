@@ -1,473 +1,360 @@
-print("Loading | Started")
+local xversion = "V.2.1"
+local keyCode = "LeftAlt"
 
-local mainName = "Universal | H3"
-local Main = loadstring(game:HttpGet("https://solarishub.dev/SolarisLib.lua"))()
+if game:GetService("CoreGui"):FindFirstChild("xlpUI") then
+    game:GetService("CoreGui"):FindFirstChild("xlpUI"):Destroy()
+end
 
-local winMain = Main:New({
-   Name = mainName,
-   FolderToSave = "UniversalH3Stuff"
-})
-
--- Vars
-print("Loading | Vars 20%")
-local Character_Parts = {"Left Leg","Right Leg","leftArmVisual","rightArmVisual","Head","Torso","rightUpperArm","rightLowerArm","rightArm","leftUpperArm","leftArm","leftLowerArm","Head","LeftHand","LeftLowerArm","LeftUpperArm","RightHand","RightLowerArm","RightUpperArm","UpperTorso","LowerTorso","RightFoot","RightLowerLeg","RightUpperLeg","LeftFoot","LeftLowerLeg","LeftUpperLeg"}
-local camera = game:GetService("Workspace").CurrentCamera
+--// Variables
+local CCamera = game:GetService("Workspace").Camera 
 local lighting = game:GetService("Lighting")
 local players = game:GetService("Players")
 local LPlayer = players.LocalPlayer
-local mouse = LPlayer:GetMouse()
---ESP
-local esp_chams_color = Color3.fromRGB(255,255,255)
-local esp_main_color = Color3.fromRGB(0, 110, 255)
-local esp_enabled = false
-local esp_tracers = false
-local esp_distance = false
-local esp_tracer_origin = "Bottom" -- Top, Bottom
-local esp_health = false
-local esp_chams = false
-local esp_cham_outlines = false
-local esp_Names = false
-local esp_chams_trans = 0.7;
 
---Mods
-local hitboxes = false
-local headHitboxSize = 5
-local rootHitboxSize = 10
-local hiboxTrans = 0.5
-local hitboxColor = Color3.fromRGB(255,255,255)
-local hitboxType = "Head"
-local movementMods = false
-local xwalkSpeed = 16
-local xjumpPower = 45
+--// Setting Tables
+local setting_tbls = {
+    espTransparency = 0.2;    
+    player_esp = {
+        names = false;
+        boxes = false;
+        health = false;
+        chams = false;
+        chams_glow = false;
+        teamcheck = false;
+    };  
+    mods = {
+        hitboxEnabled = false;
+        hitboxTransparency = 0.5;
+        hitboxType = "Head";
+    };
+    camera = {
+        cameraOffsetter = false;
+        cameraOffsetX = 0;
+        cameraOffsetY = 0;
+        cameraOffsetZ = 0;
+    };
+}
 
-print("Loading | Tabs 50%")
--- Functions 
-FLYING = false
-QEfly = true
-iyflyspeed = 2
-vehicleflyspeed = 2
-function startFly(vfly)
-    if game.Workspace:FindFirstChild('ABC') ~= nil then game.Workspace:FindFirstChild('ABC'):Destroy() end
-    local part = Instance.new('Part')
-    part.Parent = workspace
-    part.Name = "ABC"
-    part.CFrame = LPlayer.Character.HumanoidRootPart.CFrame
-    part.Transparency = 1
-    part.CanCollide = false
-    part.Size = LPlayer.Character.HumanoidRootPart.Size
-    local weld = Instance.new('WeldConstraint')
-    weld.Parent = LPlayer.Character
-    weld.Part0 = LPlayer.Character.HumanoidRootPart
-    weld.Part1 = workspace.ABC
-	repeat wait() until LPlayer and LPlayer.Character and workspace.ABC and LPlayer.Character:FindFirstChild('Humanoid')
-	repeat wait() until mouse
-	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
+function resetHitboxes()
+    for i,v in pairs(players:GetChildren()) do
+        if v ~= LPlayer and v.Character and v.Character:FindFirstChild("Head") and LPlayer.Character then	            
+            v.Character["Head"].Size = LPlayer.Character.Head.Size				
+            v.Character["Head"].CanCollide = false
+            v.Character["Head"].Transparency = 0
 
-	local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-	local lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-	local SPEED = 0
-
-	local function FLY()
-		FLYING = true
-		local BG = Instance.new('BodyGyro')
-		local BV = Instance.new('BodyVelocity')
-		BG.P = 9e4
-		BG.Parent = workspace.ABC
-		BV.Parent = workspace.ABC
-		BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-		BG.cframe = workspace.CurrentCamera.CoordinateFrame
-		BV.velocity = Vector3.new(0, 0, 0)
-		BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
-		spawn(function()
-			repeat wait()
-				if not vfly and LPlayer.Character:FindFirstChildOfClass('Humanoid') then
-					LPlayer.Character.Humanoid.PlatformStand = false
-				end
-			 	if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0 then
-					SPEED = 50
-				elseif not (CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0) and SPEED ~= 0 then
-					SPEED = 0
-				end
-				if (CONTROL.L + CONTROL.R) ~= 0 or (CONTROL.F + CONTROL.B) ~= 0 or (CONTROL.Q + CONTROL.E) ~= 0 then
-					BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (CONTROL.F + CONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(CONTROL.L + CONTROL.R, (CONTROL.F + CONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
-					lCONTROL = {F = CONTROL.F, B = CONTROL.B, L = CONTROL.L, R = CONTROL.R}
-				elseif (CONTROL.L + CONTROL.R) == 0 and (CONTROL.F + CONTROL.B) == 0 and (CONTROL.Q + CONTROL.E) == 0 and SPEED ~= 0 then
-					BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (lCONTROL.F + lCONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(lCONTROL.L + lCONTROL.R, (lCONTROL.F + lCONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
-				else
-					BV.velocity = Vector3.new(0, 0, 0)
-				end
-				BG.cframe = workspace.CurrentCamera.CoordinateFrame --* CFrame.Angles(0, 0, math.rad(180))
-			until not FLYING
-			CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-			lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-			SPEED = 0
-			BG:Destroy()
-			BV:Destroy()
-			if LPlayer.Character:FindFirstChildOfClass('Humanoid') then
-				LPlayer.Character.Humanoid.PlatformStand = false
-				workspace:FindFirstChild('ABC'):Destroy()
-				LPlayer.Character.WeldConstraint:Destroy()
-			end
-		end)
-	end
-
-	flyKeyDown = mouse.KeyDown:Connect(function(KEY)
-		if KEY:lower() == 'w' then
-			CONTROL.F = (vfly and vehicleflyspeed or iyflyspeed)
-		elseif KEY:lower() == 's' then
-			CONTROL.B = - (vfly and vehicleflyspeed or iyflyspeed)
-		elseif KEY:lower() == 'a' then
-			CONTROL.L = - (vfly and vehicleflyspeed or iyflyspeed)
-		elseif KEY:lower() == 'd' then 
-			CONTROL.R = (vfly and flySpeed or iyflyspeed)
-		elseif QEfly and KEY:lower() == 'e' then
-			CONTROL.Q = (vfly and vehicleflyspeed or iyflyspeed)*2
-		elseif QEfly and KEY:lower() == 'q' then
-			CONTROL.E = -(vfly and vehicleflyspeed or iyflyspeed)*2
-		end
-		pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Track end)
-	end)
-    
-	flyKeyUp = mouse.KeyUp:Connect(function(KEY)
-		if KEY:lower() == 'w' then
-			CONTROL.F = 0
-		elseif KEY:lower() == 's' then
-			CONTROL.B = 0
-		elseif KEY:lower() == 'a' then
-			CONTROL.L = 0
-		elseif KEY:lower() == 'd' then
-			CONTROL.R = 0
-		elseif KEY:lower() == 'e' then
-			CONTROL.Q = 0
-		elseif KEY:lower() == 'q' then
-			CONTROL.E = 0
-		end
-	end)
-	FLY()
-end
-function stopFly()
-	FLYING = false
-	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
-	if LPlayer.Character:FindFirstChildOfClass('Humanoid') then
-		LPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
-	end
-	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
+            v.Character["HumanoidRootPart"].Size = LPlayer.Character["HumanoidRootPart"].Size				
+            v.Character["HumanoidRootPart"].CanCollide = false
+            v.Character["HumanoidRootPart"].Transparency = 1
+        end
+    end
 end
 
---Main | Combat
-local mainTab = winMain:Tab("Main")
-local mainSec = mainTab:Section("Hitbox Changer")
+--// Library
+local FinityLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/not-weuz/Lua/main/xlpuitest.lua"))()
+local mainWind = FinityLib.new(true,"Universal H3 | "..xversion.."  ".."Keybind: ["..tostring(keyCode).."]".." | By H3#3534")
+mainWind.ChangeToggleKey(Enum.KeyCode[keyCode])
+ 
+--// Categories
+local localCategory = mainWind:Category("Local Player")
+local playersCategory = mainWind:Category("Players")
+local visualCategory = mainWind:Category("Visual")
 
---Player
-local plrTab = winMain:Tab("Player")
-local plrSec = plrTab:Section("Player Main")
-
---ESP
-local espTab = winMain:Tab("ESP")
-local espSec = espTab:Section("ESP Main")
-
---Visuals
-local visualsTab = winMain:Tab("Visuals")
-local visual_sec = visualsTab:Section("World")
-
---<Hitboxes
-mainSec:Toggle("Hitboxes", false,"Toggle", function(t)
-    hitboxes = t
-end)
-mainSec:Dropdown("Hitbox Type", {"Head","HumanoidRootPart"},"","Dropdown", function(t)
-	hitboxType = t    
-end)
-mainSec:Colorpicker("Hitbox Color", Color3.fromRGB(255,255,255),"Colorpicker", function(c)
-	hitboxColor = c
-end)
-mainSec:Slider("Hitbox Transparency", 0,1,0.5,0.1,"Slider", function(s)
-	hiboxTrans = s
-end)
-mainSec:Slider("Head Size", 0,100,1,0.5,"Slider", function(s)
-	headHitboxSize = s
-end)
-mainSec:Slider("RootPart Size", 0,55,1,1,"Slider", function(s)
-	rootHitboxSize = s
-end)
---<Player
-plrSec:Toggle("Movement overide", false,"Toggle", function(t)
-    movementMods = t
-end)
-plrSec:Slider("WalkSpeed", 0,200,16,0.1,"Slider", function(s)
-	xwalkSpeed = s
-end)
-plrSec:Slider("JumpPower", 0,100,45,0.1,"Slider", function(s)
-	xjumpPower = s
-end)
-plrSec:Bind("Flight", Enum.KeyCode.World0, false, "BindNormal", function(v)
-    if v then
-        startFly()
+--// Sectors / Mods
+local lvisualSector = localCategory:Sector("Visuals")
+local lmoveSector = localCategory:Sector("Movement")
+lvisualSector:Cheat("Checkbox", "Third Person (not for all games)", function(State)
+	if State then
+        LPlayer.CameraMode = "Classic"
     else
-        stopFly()
+        LPlayer.CameraMode = "LockFirstPerson"
     end
 end)
---<ESP
-espSec:Toggle("ESP Enabled", false,"Toggle", function(t)
-    esp_enabled = t
+lvisualSector:Cheat("Slider", "FieldOfView", function(Value)
+	CCamera.FieldOfView = Value
+end, {min = 0, max = 120, suffix = ""})
+
+lmoveSector:Cheat("Slider", "Walkspeed", function(v)
+	LPlayer.Character.Humanoid.WalkSpeed = v
+end, {min = 5, max = 250, suffix = ""})
+lmoveSector:Cheat("Slider", "Jump Power", function(v)
+	LPlayer.Character.Humanoid.JumpPower = v
+end, {min = 5, max = 250, suffix = ""})
+
+local pmodSector = playersCategory:Sector("Specific")
+local visSector = playersCategory:Sector("All Players")
+visSector:Cheat("Checkbox", "Names", function(State)	
+    setting_tbls.player_esp.names = State
 end)
-espSec:Toggle("ESP Names", false,"Toggle", function(t)
-    esp_Names = t
+visSector:Cheat("Checkbox", "Boxes", function(State)	
+    setting_tbls.player_esp.boxes = State
 end)
-espSec:Toggle("ESP Distance", false,"Toggle", function(t)
-    esp_distance = t
+visSector:Cheat("Checkbox", "Health", function(State)	
+    setting_tbls.player_esp.health = State
 end)
-espSec:Toggle("ESP Health", false,"Toggle", function(t)
-    esp_health = t
+visSector:Cheat("Checkbox", "Team Check", function(State)	
+    setting_tbls.player_esp.teamcheck = State
+    if setting_tbls.mods.hitboxEnabled then
+        resetHitboxes()
+    end
 end)
-espSec:Toggle("ESP Chams", false,"Toggle", function(t)
-    esp_chams = t
+visSector:Cheat("Checkbox", "Chams", function(State)	
+    setting_tbls.player_esp.chams = State
+    local char_parts ={ "Head", "LeftFoot", "LeftHand", "LeftLowerArm", "LeftLowerLeg", "LeftUpperArm", "LeftUpperLeg", "LowerTorso", "RightFoot", "RightHand", "RightLowerArm", "RightLowerLeg", "RightUpperArm", "RightUpperLeg", "UpperTorso" }
+    coroutine.wrap(function()    
+        repeat wait(1)
+            if setting_tbls.player_esp.chams then
+                pcall(function()
+                    for _,v in pairs(players:GetPlayers()) do
+                        if v ~= LPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                            if not (setting_tbls.player_esp.teamcheck and v.Team ~= LPlayer.Team or not setting_tbls.player_esp.teamcheck) then
+                                continue;
+                            end
+                            for _,p in pairs(char_parts) do
+                                if v.Character:FindFirstChild(p) then
+                                    local part = v.Character[p]
+                                    local box = Instance.new("BoxHandleAdornment")                                
+                                    box.Parent = game.CoreGui
+                                    box.AlwaysOnTop = true
+                                    box.Adornee = part
+                                    box.ZIndex = 0
+                                    box.Transparency = 0.8
+                                    box.Color3 = Color3.fromRGB(255, 255, 255)
+                                    if p == "Head"then
+                                        box.Size = Vector3.new(1.05,1.05,1.05)
+                                    else
+                                        box.Size = part.Size + Vector3.new(.05,.05,.05)
+                                    end
+                                    coroutine.wrap(function()
+                                        wait(1)
+                                        box:Destroy()
+                                    end)()
+                                end
+                            end
+                        end
+                    end
+                end)
+            end        
+        until setting_tbls.player_esp.chams == false            
+    end)()
 end)
-espSec:Toggle("ESP Cham outline", false,"Toggle", function(t)
-    esp_cham_outlines = t
-end)
-espSec:Toggle("ESP Tracers", false,"Toggle", function(t)
-    esp_tracers = t
-end)
-espSec:Dropdown("Tracer origin", {"Bottom","Top","Mouse"},"Bottom","Dropdown", function(t)
-	esp_tracer_origin = t
-end)
-espSec:Colorpicker("ESP Color", Color3.fromRGB(255,255,255),"Colorpicker", function(c)
-	esp_main_color = c
-end)
-espSec:Slider("Chams Transparency", 0,1,0.7,0.05,"Slider", function(s)
-	esp_chams_trans = s
-end)
---<Wrld
-visual_sec:Toggle("World Shadows", lighting.GlobalShadows,"Toggle", function(t)
-    lighting.GlobalShadows = t
-end)
-visual_sec:Slider("Brightness", 0,20,math.ceil(lighting.Brightness),0.1,"Slider", function(s)
-	lighting.Brightness = s
-end)
-visual_sec:Slider("ExposureCompensation", 0,10,lighting.ExposureCompensation,0.1,"Slider", function(s)
-	lighting.ExposureCompensation = s
-end)
-visual_sec:Slider("Clock Time", 0,23,math.ceil(lighting.ClockTime),0.05,"Slider", function(s)
-	lighting.ClockTime = s
-end)
-visual_sec:Colorpicker("Fog Color", lighting.FogColor,"Colorpicker", function(c)
-	lighting.FogColor = c
-end)
-visual_sec:Colorpicker("World Aimbient", lighting.Ambient,"Colorpicker", function(c)
-	lighting.Ambient = c
-end)
-visual_sec:Colorpicker("Outdoor Aimbient", lighting.OutdoorAmbient,"Colorpicker", function(c)
-	lighting.OutdoorAmbient = c
+local targetedPlayer;
+pmodSector:Cheat("Textbox", "Target Player", function(Value)
+    local txt = string.lower(Value)
+    for i,v in pairs(players:GetChildren()) do
+        if v.Character and string.lower(v.Name):match(txt) then
+            targetedPlayer = v;
+            print(v.Name)
+        end
+    end	
+end, {placeholder = "Player Name"})
+pmodSector:Cheat("Checkbox", "Spectate", function(s)	
+    if s then
+        LPlayer.CameraMode = "Classic"
+        workspace.Camera.CameraSubject = targetedPlayer.Character.Humanoid
+    else
+        LPlayer.CameraMode = "LockFirstPerson"
+        workspace.Camera.CameraSubject = LPlayer.Character.Humanoid
+    end
 end)
 
-print("Loading | Main 70%")
---Main
+visSector:Cheat("Checkbox", "Hit boxes", function(State)	
+    resetHitboxes()
+    setting_tbls.mods.hitboxEnabled = State
+end)
+visSector:Cheat("Dropdown", "Hitbox Type", function(Option)
+    resetHitboxes()
+    setting_tbls.mods.hitboxType = Option
+end, {options = {"Head","HumanoidRootPart"}})
+visSector:Cheat("Slider", "Hitbox Size (Max Head [6.2])", function(Value)    
+	setting_tbls.mods.hitboxSize = Value
+end, {min = 1, max = 35, suffix = ""}) 
+ 
+local worldSector = visualCategory:Sector("World")
+worldSector:Cheat("Checkbox", "World Shadows", function(State)      
+    lighting.GlobalShadows = State 
+end)
+worldSector:Cheat("Slider", "Brightness", function(Value)
+	lighting.Brightness = Value
+end, {min = 0, max = 15, suffix = ""})
+worldSector:Cheat("Slider", "Exposure", function(Value)
+	lighting.ExposureCompensation = Value
+end, {min = 0, max = 2, suffix = ""})
+worldSector:Cheat("Slider", "WaterTransparency", function(Value)
+	game:GetService("Workspace").Terrain.WaterTransparency = Value
+end, {min = 0, max = 1, suffix = ""})
+worldSector:Cheat("Slider", "WaterReflectance", function(Value)
+	game:GetService("Workspace").Terrain.WaterReflectance = Value
+end, {min = 0, max = 1, suffix = ""})
+
 coroutine.wrap(function()
-	while wait(.5) do
+	while wait(1) do
 		pcall(function()	
-			if hitboxes then				
+			if setting_tbls.mods.hitboxEnabled then				
 				for i,v in pairs(players:GetChildren()) do
-					if v ~= LPlayer and v.Character ~= nil and v.Character:FindFirstChild("Head") then
-						if hitboxType == "HumanoidRootPart" then
-							v.Character[hitboxType].Size = Vector3.new(rootHitboxSize,rootHitboxSize,rootHitboxSize)
-                            v.Character.Head.Size = LPlayer.Character.Head.Size
-						else 
-							v.Character[hitboxType].Size = Vector3.new(headHitboxSize,headHitboxSize,headHitboxSize)
-                            v.Character.HumanoidRootPart.Size = LPlayer.Character.HumanoidRootPart.Size
-						end
-						v.Character[hitboxType].CanCollide = false
-						v.Character[hitboxType].Transparency = hiboxTrans
-						v.Character[hitboxType].Color = hitboxColor
+					if v ~= LPlayer and v.Character ~= nil and v.Character:FindFirstChild("Head") then	
+                        if not (setting_tbls.player_esp.teamcheck and v.Team ~= LPlayer.Team or not setting_tbls.player_esp.teamcheck) then
+                            continue;
+                        end
+						v.Character[setting_tbls.mods.hitboxType].Size = Vector3.new(setting_tbls.mods.hitboxSize,setting_tbls.mods.hitboxSize,setting_tbls.mods.hitboxSize)						
+						v.Character[setting_tbls.mods.hitboxType].CanCollide = false
+						v.Character[setting_tbls.mods.hitboxType].Transparency = setting_tbls.mods.hitboxTransparency					
 					end
 				end
 			end
 		end)
 	end	
 end)()
-coroutine.wrap(function()
-    while wait(1)do
-        pcall(function()
-            if esp_enabled then                
-                for _,v in pairs(players:GetPlayers()) do
-                    if v.Name ~= LPlayer.Name and v.Team ~= LPlayer.Team and v.Character ~= nil then
-                        for _,c in pairs(Character_Parts)do
-                            if esp_chams then
-                                if v.Character:FindFirstChild(c) then
-                                    local part = v.Character[c]
-                                    local a = Instance.new("BoxHandleAdornment")
-                                    if c == "Head"then
-                                        a.Size = Vector3.new(1.05,1.05,1.05)
-                                    else
-                                        a.Size = part.Size+Vector3.new(.05,.05,.05)
-                                    end
-                                    a.Parent = game.CoreGui
-                                    a.AlwaysOnTop = true
-                                    a.Adornee = part
-                                    a.ZIndex = 0
-                                    a.Transparency = esp_chams_trans
-                                    a.Color3 = esp_chams_color
-                                    coroutine.wrap(function()
-                                        wait(1)
-                                        a:Destroy()
-                                    end)()                             
-                                end
-                            end
-                            if esp_cham_outlines then
-                                if v.Character:FindFirstChild(c) then
-                                    off = 0.5
-                                    local part = v.Character[c]
-                                    local a = Instance.new("BoxHandleAdornment")
-                                    if c == "Head"then
-                                        a.Size = Vector3.new(1+off,1+off,1+off)
-                                    else
-                                        a.Size = part.Size+Vector3.new(off,off,off)
-                                    end
-                                    a.Parent = game.CoreGui
-                                    a.AlwaysOnTop = false
-                                    a.Adornee = part
-                                    a.ZIndex = 0
-                                    a.Transparency = 0.3
-                                    a.Color3 = esp_main_color
-                                    coroutine.wrap(function()
-                                        wait(1)
-                                        a:Destroy()
-                                    end)()                             
-                                end
-                            end
-                        end
-                    end
-                end
-            end			
-		end)
-	end
-end)()
 
-game:GetService("RunService").RenderStepped:connect(function()       
-    if esp_enabled then       
-        for _,v in pairs(players:GetChildren()) do
-            if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("Humanoid").Health > 0 and v ~= LPlayer then
-            local part = v.Character.HumanoidRootPart         
-            local distance = LPlayer:DistanceFromCharacter(v.Character.HumanoidRootPart.Position)              
-            local Vector ,b=game.Workspace.CurrentCamera:WorldToViewportPoint(part.Position)
-                if b then
-                    if esp_Names then
-                        local a=Drawing.new("Text")                        
-                        if esp_distance then                
-                            a.Text = v.Name .. " [" .. math.ceil(distance) .. "]"
-                         else                            
-                            a.Text = v.Name                                         
-                         end
-                        a.Size=math.clamp(16-(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude,16,83)
-                        a.Center=true
-                        a.Outline=true
-                        a.OutlineColor=Color3.new()
-                        a.Font=Drawing.Fonts.UI
-                        a.Visible=true
-                        a.Transparency=1
-                        a.Color=esp_main_color
-                        a.Position=Vector2.new(
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/25)).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.UpVector*(3+(part.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/40)).Y)
-                        coroutine.wrap(function()
+local boxheight1 = 2.5
+local boxWidth1 = 1.5
+local boxheight2 = 3
+local boxWidth2 = 1.5
+game:GetService("RunService").RenderStepped:Connect(function()
+    --// Player ESP
+    for i,v in pairs(players:GetPlayers()) do
+        if v ~= LPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then   
+            if not (setting_tbls.player_esp.teamcheck and v.Team ~= LPlayer.Team or not setting_tbls.player_esp.teamcheck) then
+                continue
+            end
+
+            local dist = (v.Character:FindFirstChild("HumanoidRootPart").Position-LPlayer.Character.HumanoidRootPart.Position).Magnitude
+            local espPart = v.Character.Head
+            local boxPart = v.Character.HumanoidRootPart
+            local vector, onScreen = CCamera:WorldToViewportPoint(espPart.Position)
+            local vector_2, onScreen2 = CCamera:WorldToViewportPoint(boxPart.Position)
+
+            if setting_tbls.player_esp.names and onScreen then                     
+                    local nameTag = Drawing.new("Text")            
+                    nameTag.Visible = true            
+                    nameTag.Font = 1
+                    nameTag.Center = true
+                    nameTag.Outline = true
+                    nameTag.Size = math.clamp(16-(espPart.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude,16,83)
+                    nameTag.Color = Color3.fromRGB(255,255,255)       
+                    nameTag.Text = v.Name.." | "..math.round(dist)
+                    nameTag.Position = Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.UpVector*(3+(boxPart.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/25)).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.UpVector*(3+(boxPart.Position-game.Workspace.CurrentCamera.CFrame.Position).Magnitude/26)).Y)                     
+                    coroutine.wrap(function()                    
                         game.RunService.RenderStepped:Wait()
-                        a:Remove()
-                        end)()
-                    end                    
-                    if esp_health then
-                        local healthnum=v.Character.Humanoid.Health
-                        local maxhealth=v.Character.Humanoid.MaxHealth
-                        local c=Drawing.new("Quad")
-                        c.Visible=true
-                        c.Color=Color3.new(0,1,0)
-                        c.Thickness=1
-                        c.Transparency=1
-                        c.Filled=false
-                        c.PointA=Vector2.new(
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).Y)
-                        c.PointB=Vector2.new(
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).Y)
-                        c.PointC=Vector2.new(
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).Y)
-                        c.PointD=Vector2.new(
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).Y)
-                        coroutine.wrap(function()
+                        nameTag:Remove()
+                    end)()
+            end            
+            if setting_tbls.player_esp.boxes and onScreen2 then
+                    local boxPart = v.Character.HumanoidRootPart                            
+                    --// Outline box          
+                    local boxOutline = Drawing.new("Quad")       
+                    boxOutline.Visible = true
+                    boxOutline.Color = Color3.new(0, 0, 0)
+                    boxOutline.Thickness = 2.5
+                    boxOutline.Transparency = 1
+                    boxOutline.Filled = false
+                    boxOutline.ZIndex = 1     
+                    boxOutline.PointA = Vector2.new(
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector *-boxWidth2 + boxPart.CFrame.UpVector * boxheight1).X,
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector *-boxWidth2 + boxPart.CFrame.UpVector * boxheight1).Y)  
+                    boxOutline.PointB = Vector2.new(
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector * boxWidth1 + boxPart.CFrame.UpVector * boxheight1).X,
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector * boxWidth1 + boxPart.CFrame.UpVector * boxheight1).Y)  
+                    boxOutline.PointC = Vector2.new(
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector * boxWidth1 + boxPart.CFrame.UpVector * -boxheight2).X,
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector * boxWidth1 + boxPart.CFrame.UpVector * -boxheight2).Y)  
+                    boxOutline.PointD = Vector2.new(
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector *-boxWidth2 + boxPart.CFrame.UpVector * -boxheight2).X,
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector *-boxWidth2 + boxPart.CFrame.UpVector * -boxheight2).Y)
+    
+                    --// Main box                    
+                    local box = Drawing.new("Quad")       
+                    box.Visible = true
+                    box.Color = Color3.new(1, 1, 1)
+                    box.Thickness = 1
+                    box.Transparency = 1
+                    box.Filled = false
+                    box.ZIndex = 2                  
+                    box.PointA = Vector2.new(
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector *-boxWidth2 + boxPart.CFrame.UpVector * boxheight1).X,
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector *-boxWidth2 + boxPart.CFrame.UpVector * boxheight1).Y)  
+                    box.PointB = Vector2.new(
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector * boxWidth1 + boxPart.CFrame.UpVector * boxheight1).X,
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector * boxWidth1 + boxPart.CFrame.UpVector * boxheight1).Y)  
+                    box.PointC = Vector2.new(
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector * boxWidth1 + boxPart.CFrame.UpVector * -boxheight2).X,
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector * boxWidth1 + boxPart.CFrame.UpVector * -boxheight2).Y)  
+                    box.PointD = Vector2.new(
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector *-boxWidth2 + boxPart.CFrame.UpVector * -boxheight2).X,
+                        CCamera:WorldToViewportPoint(boxPart.CFrame.Position + boxPart.CFrame.RightVector *-boxWidth2 + boxPart.CFrame.UpVector * -boxheight2).Y)             
+                    coroutine.wrap(function()
+                        game.RunService.RenderStepped:wait()
+                        box:Remove()
+                        boxOutline:Remove()
+                    end)() 
+            end
+            if setting_tbls.player_esp.health and onScreen then
+                    local healthnum=v.Character.Humanoid.Health
+                    local maxhealth=v.Character.Humanoid.MaxHealth
+                    local c=Drawing.new("Quad")
+                    c.Visible=true
+                    c.Color=Color3.new(0,1,0)
+                    c.Thickness=1
+                    c.Transparency=1
+                    c.Filled=false
+                    c.PointA=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2.5+boxPart.CFrame.UpVector*2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2.5+boxPart.CFrame.UpVector*2.5).Y)
+                    c.PointB=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2+boxPart.CFrame.UpVector*2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2+boxPart.CFrame.UpVector*2.5).Y)
+                    c.PointC=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2+boxPart.CFrame.UpVector*-boxheight2).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2+boxPart.CFrame.UpVector*-boxheight2).Y)
+                    c.PointD=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2.5+boxPart.CFrame.UpVector*-boxheight2).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2.5+boxPart.CFrame.UpVector*-boxheight2).Y)
+                    coroutine.wrap(function()
+                    game.RunService.RenderStepped:Wait()
+                        c:Remove()
+                    end)()
+                    local e=Drawing.new("Quad")
+                    e.Visible=true
+                    e.Color=Color3.new(1,0,0)
+                    e.Thickness=1
+                    e.Transparency=1
+                    e.Filled=true
+                    e.PointA=Vector2.new(
+                    game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2.5+boxPart.CFrame.UpVector*2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2.5+boxPart.CFrame.UpVector*2.5).Y)
+                    e.PointB=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2+boxPart.CFrame.UpVector*2.5).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2+boxPart.CFrame.UpVector*2.5).Y)
+                    e.PointC=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2+boxPart.CFrame.UpVector*-boxheight2).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2+boxPart.CFrame.UpVector*-boxheight2).Y)
+                    e.PointD=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2.5+boxPart.CFrame.UpVector*-boxheight2).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2.5+boxPart.CFrame.UpVector*-boxheight2).Y)
+                    coroutine.wrap(function()
                         game.RunService.RenderStepped:Wait()
-                            c:Remove()
-                        end)()
-                        local e=Drawing.new("Quad")
-                        e.Visible=true
-                        e.Color=Color3.new(1,0,0)
-                        e.Thickness=1
-                        e.Transparency=1
-                        e.Filled=true
-                        e.PointA=Vector2.new(
-                        game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*2.5).Y)
-                        e.PointB=Vector2.new(
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*2.5).Y)
-                        e.PointC=Vector2.new(
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*-2.5).Y)
-                        e.PointD=Vector2.new(
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*-2.5).Y)
-                        coroutine.wrap(function()
-                            game.RunService.RenderStepped:Wait()
-                            e:Remove()
-                        end)()
-                        local d=Drawing.new("Quad")
-                        d.Visible=true
-                        d.Color=Color3.new(0,1,0)
-                        d.Thickness=1
-                        d.Transparency=1
-                        d.Filled=true
-                        d.PointA=Vector2.new(
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2.5+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).Y)
-                        d.PointB=Vector2.new(
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).X,
-                            game.Workspace.CurrentCamera:WorldToViewportPoint(part.CFrame.Position+part.CFrame.RightVector*2+part.CFrame.UpVector*(-2.5+healthnum/(maxhealth/5))).Y)
-                        d.PointC=c.PointC
-                        d.PointD=c.PointD
-                        coroutine.wrap(function()
-                            game.RunService.RenderStepped:Wait()
-                            d:Remove()
-                        end)()
-                    end  
-                    if esp_tracers then
-                        local t = Drawing.new("Line")
-                        t.Visible = true
-                        t.Color = esp_main_color
-                        t.Thickness = 0.6
-                        t.Transparency = 0.9
-                        if esp_tracer_origin == "Bottom" then
-                            t.From = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y - 100)       
-                            else if esp_tracer_origin == "Top" then
-                                t.From = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y - 1000)  
-                                else if esp_tracer_origin == "Mouse" then
-                                    t.From = Vector2.new(mouse.X, mouse.Y + 40)   
-                                end                           
-                            end 
-                        end   
-                        t.To = Vector2.new(Vector.X, Vector.Y)          
-                        coroutine.wrap(function()
-                            game.RunService.RenderStepped:Wait()
-                            t:Remove()
-                        end)()
-                    end                                                   
-                end
-            end                       
+                        e:Remove()
+                    end)()
+                    local d=Drawing.new("Quad")
+                    d.Visible=true
+                    d.Color=Color3.new(0,1,0)
+                    d.Thickness=1
+                    d.Transparency=1
+                    d.Filled=true
+                    d.PointA=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2.5+boxPart.CFrame.UpVector*(-boxheight2+healthnum/(maxhealth/5))).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2.5+boxPart.CFrame.UpVector*(-boxheight2+healthnum/(maxhealth/5))).Y)
+                    d.PointB=Vector2.new(
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2+boxPart.CFrame.UpVector*(-boxheight2+healthnum/(maxhealth/5))).X,
+                        game.Workspace.CurrentCamera:WorldToViewportPoint(boxPart.CFrame.Position+boxPart.CFrame.RightVector*2+boxPart.CFrame.UpVector*(-boxheight2+healthnum/(maxhealth/5))).Y)
+                    d.PointC=c.PointC
+                    d.PointD=c.PointD
+                    coroutine.wrap(function()
+                        game.RunService.RenderStepped:Wait()
+                        d:Remove()
+                    end)()
+            end            
         end
-    end  
-    if movementMods then
-        LPlayer.Character.Humanoid.WalkSpeed = xwalkSpeed 
-        LPlayer.Character.Humanoid.JumpPower = xjumpPower
-    end
+    end       
 end)
-
-print("Loading | Main 100%")
