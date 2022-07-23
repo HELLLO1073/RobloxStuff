@@ -1,6 +1,6 @@
--- // Old anomic gui not the best scripting ill admit, could use more optimising.
+--// Anomic Script, old and buggy could use a rewrite entirely i admit.
 
-local mainName = "Anomic V | 2.7.8" 
+local mainName = "Anomic V | 2.8.4" 
 if game:GetService("CoreGui"):FindFirstChild(mainName) then
     game.CoreGui[mainName]:Destroy()
 end
@@ -8,7 +8,7 @@ end
 print("Loading | LIB") 
 
 -- Library
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/HELLLO1073/Roblox-scripts-2.0/main/UIS/venyxUI-mod.lua"))()
 local Main = library.new(mainName)
 
 -- // Tabs
@@ -55,14 +55,12 @@ local teleSection4 = tele:addSection("Miscellaneous")
 
 -- // Buy Section
 local paintSection = Buy:addSection("Painting")
-local BuySectionAmmo = Buy:addSection("Ammo Buyer")
+local AutoBuySection = Buy:addSection("Auto Buy")
 local BuySectionMisc2 = Buy:addSection("Misc / Troll")
 
 -- // Miscellaneous Section
 local miscSection = misc:addSection("Miscellaneous")
-local wepSection = misc:addSection("Miscellaneous Tools")
 local CarSection = misc:addSection("Miscellaneous Vehicle")
-local AnimationSection = misc:addSection("Animations")
 local boomSection = misc:addSection("Boombox Player (Hold Boombox)")
 
 -- // UI Section
@@ -72,7 +70,7 @@ local UISection = Ui:addSection("UI")
 -- // Credits Section
 local creds = Ui:addSection("Developers: H3#3534, Krypton#3195.")
 local UISection2 = Ui:addSection("Discord: https://discord.gg/jhb37CBT8U")
-local UISection2 = Ui:addSection("Creds: EdgeIY, for the fly")
+local UISection2 = Ui:addSection("Credits: EdgeIY, for the fly, Alwayswin for a few FE features")
 
 print("Loading | R")
 if syn then
@@ -93,6 +91,7 @@ if syn then
         }),
     })
 end
+
 local chatSettings = require(game:GetService("Chat").ClientChatModules.ChatSettings)
 local chatFrame = game:GetService("Players").LocalPlayer.PlayerGui.Chat.Frame
 chatSettings.WindowResizable = true
@@ -115,6 +114,7 @@ local esp_tracer_orig  = "Bottom"
 local esp_Main_Colour  = Color3.fromRGB(255, 255, 255)
 local rainbow_char     = false
 local rainbow_hair     = false
+local esp_tools        = false
 -- Player
 local CSEvents = game:GetService("ReplicatedStorage"):WaitForChild("_CS.Events")
 local teamList = require(game:GetService("ReplicatedStorage").Client.TeamList)
@@ -131,12 +131,14 @@ local jumpMode = "Infinite"
 local infiniteJump = false
 local gunSoundSpam = false
 local shotgunMod1 = false
-local shotgunMod2 = false
 local Rmod = false
 local speedBypass = false
-local headHitboxSize = 5
-local autoStore = false
+
 local Hitboxes = false
+local headHitboxSize = 5
+local hitboxTransparency = 0.7
+
+local autoStore = false
 local minHealth = 70
 local AutoHeal = false
 local antiCar = false
@@ -146,15 +148,21 @@ local SpeedSDelay = 0.05
 local shotMulti = false
 local shotMultiAmmount = 1
 local targetHighlight = false
+
+local customHitSound = false
+local customHitSoundType = "Skeet"
+local alwaysHeadShot = false
+
 _G.flySpeed = 1
-_G.JumpHeight = 30
-_G.Enabled = true
-_G.ThemeMode = "Purple" -- Red,Green,White
+local lJumpHeight = 30
+local ThemeEnabled = true
+local ThemeMode = "Purple" -- Red,Green,White
 local folderImpacts = game:GetService("Workspace").RayIgnore.BulletHoles
+
+local DevList = {"BonfireHubWhen", "US3RNAME_1ACC", "Tempo_Tantrum"}
 
 print("Loading | TeamMod")
 for i,v in pairs(teamList) do    
-    v.DataType = v.DataType .. " :  Anomic V"   
     v.Spawns = { "Arway", "Sheriff Station", "Eastdike", "Eaphis Plateau", "Pahrump", "Okby Steppe", "Depository", "Airfield", "Depot", "Clinic", "Towing Company"}    
 end
 
@@ -188,10 +196,7 @@ local function bypass()
                 if tostring(method) == "FireServer" then
                     if shotgunMod1 and tostring(self) == "AmmoRemover" then                        
                         return nil
-                    end
-                    if shotgunMod2 and tostring(self) == "RayDrawer" then                        
-                        return nil
-                    end                    
+                    end                           
                 end
                 if tostring(method) == "Fire" then
                     if Rmod and tostring(self) == "ShootAnim" then
@@ -202,6 +207,7 @@ local function bypass()
         end
     end)         
 end
+
 print("Loading anti kick")
 local protect = newcclosure or protect_function
 hookfunction(game:GetService("Players").LocalPlayer.Kick,protect(function() 
@@ -217,7 +223,7 @@ local colors = {
 }
 function setTheme()
    if LPlayer.PlayerGui:FindFirstChild("MainUIHolder") and LPlayer ~= nil  then 
-       print("Theme set")
+       --print("Theme set")
        LPlayer.PlayerGui.MainMenu.ButtonBar.Teams.BackgroundColor3 = colors.grey
        LPlayer.PlayerGui.MainMenu.ButtonBar.Spawn.BackgroundColor3 = colors.lightGrey
        LPlayer.PlayerGui.MainMenu.ButtonBar.Editor.BackgroundColor3 = colors.grey
@@ -272,26 +278,26 @@ function setTheme()
            LPlayer.PlayerGui.MainUIHolder.MenuBar.ImageLabel.BackgroundColor3 = colors.black
            LPlayer.PlayerGui.MainUIHolder.MenuBar.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
            LPlayer.PlayerGui.MainUIHolder.MenuBar.BackgroundColor3 = Color3.fromRGB(15,15,15)
-           if _G.ThemeMode == "Purple" then
+           if ThemeMode == "Purple" then
                LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.Bar.BackgroundColor3 = Color3.fromRGB(255, 29, 108) -- Stam
-               else if _G.ThemeMode == "Red" then
+               else if ThemeMode == "Red" then
                    LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.Bar.BackgroundColor3 = Color3.fromRGB(199, 0, 0) -- Stam
-                   else if _G.ThemeMode == "Green" then
+                   else if ThemeMode == "Green" then
                        LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.Bar.BackgroundColor3 = Color3.fromRGB(41, 206, 0) -- Stam
-                       else if _G.ThemeMode == "White" then
+                       else if ThemeMode == "White" then
                            LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.Bar.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Stam
                            LPlayer.PlayerGui.MainUIHolder.StaminaBar.Background.StatNum.TextColor3 = Color3.fromRGB(0, 0, 0)
                        end
                    end
                end
            end
-           if _G.ThemeMode == "Purple" then
+           if ThemeMode == "Purple" then
                LPlayer.PlayerGui.MainUIHolder.MenuBar.CashDisplay.TextColor3 = Color3.fromRGB(150,0,150) -- Cash
-               else if _G.ThemeMode == "Red" then
+               else if ThemeMode == "Red" then
                    LPlayer.PlayerGui.MainUIHolder.MenuBar.CashDisplay.TextColor3 = Color3.fromRGB(201, 0, 0) -- Cash
-                   else if _G.ThemeMode == "Green" then
+                   else if ThemeMode == "Green" then
                        LPlayer.PlayerGui.MainUIHolder.MenuBar.CashDisplay.TextColor3 = Color3.fromRGB(93, 233, 0) -- Cash
-                       else if _G.ThemeMode == "White" then
+                       else if ThemeMode == "White" then
                            LPlayer.PlayerGui.MainUIHolder.MenuBar.CashDisplay.TextColor3 = Color3.fromRGB(255, 255, 255) -- Cash
                        end
                    end
@@ -381,28 +387,26 @@ local function anonymous()
         end)
     end)
 end
-IYMouse = game.Players.LocalPlayer:GetMouse()
-local Players = game.Players
+
 FLYING = false
 QEfly = true
 iyflyspeed = 2
 vehicleflyspeed = 2
-function sFLY(vfly)
-    if game.Workspace:FindFirstChild('ABC') ~= nil then game.Workspace:FindFirstChild('ABC'):Destroy()
-        end
+function startFly()  
+    if game.Workspace:FindFirstChild('ABC') ~= nil then game.Workspace:FindFirstChild('ABC'):Destroy() end
     local part = Instance.new('Part')
     part.Parent = workspace
     part.Name = "ABC"
-    part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+    part.CFrame = LPlayer.Character.HumanoidRootPart.CFrame
     part.Transparency = 1
     part.CanCollide = false
-    part.Size = game.Players.LocalPlayer.Character.HumanoidRootPart.Size
+    part.Size = LPlayer.Character.HumanoidRootPart.Size
     local weld = Instance.new('WeldConstraint')
-    weld.Parent = game.Players.LocalPlayer.Character
-    weld.Part0 = game.Players.LocalPlayer.Character.HumanoidRootPart
+    weld.Parent = LPlayer.Character
+    weld.Part0 = LPlayer.Character.HumanoidRootPart
     weld.Part1 = workspace.ABC
-	repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and workspace.ABC and Players.LocalPlayer.Character:FindFirstChild('Humanoid')
-	repeat wait() until IYMouse
+	repeat wait() until LPlayer and LPlayer.Character and workspace.ABC and LPlayer.Character:FindFirstChild('Humanoid')
+	repeat wait() until mouse
 	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
 
 	local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
@@ -411,6 +415,7 @@ function sFLY(vfly)
 
 	local function FLY()
 		FLYING = true
+        local yes = true
 		local BG = Instance.new('BodyGyro')
 		local BV = Instance.new('BodyVelocity')
 		BG.P = 9e4
@@ -422,8 +427,8 @@ function sFLY(vfly)
 		BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
 		spawn(function()
 			repeat wait()
-				if not vfly and Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-					game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false
+				if not yes and LPlayer.Character:FindFirstChildOfClass('Humanoid') then
+					LPlayer.Character.Humanoid.PlatformStand = false
 				end
 			 	if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0 then
 					SPEED = 50
@@ -445,15 +450,15 @@ function sFLY(vfly)
 			SPEED = 0
 			BG:Destroy()
 			BV:Destroy()
-			if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-				game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false
+			if LPlayer.Character:FindFirstChildOfClass('Humanoid') then
+				LPlayer.Character.Humanoid.PlatformStand = false
 				workspace:FindFirstChild('ABC'):Destroy()
-				game.Players.LocalPlayer.Character.WeldConstraint:Destroy()
+				LPlayer.Character.WeldConstraint:Destroy()
 			end
 		end)
 	end
 
-	flyKeyDown = IYMouse.KeyDown:Connect(function(KEY)
+	flyKeyDown = mouse.KeyDown:Connect(function(KEY)
 		if KEY:lower() == 'w' then
 			CONTROL.F = (vfly and vehicleflyspeed or iyflyspeed)
 		elseif KEY:lower() == 's' then
@@ -470,7 +475,7 @@ function sFLY(vfly)
 		pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Track end)
 	end)
     
-	flyKeyUp = IYMouse.KeyUp:Connect(function(KEY)
+	flyKeyUp = mouse.KeyUp:Connect(function(KEY)
 		if KEY:lower() == 'w' then
 			CONTROL.F = 0
 		elseif KEY:lower() == 's' then
@@ -485,22 +490,30 @@ function sFLY(vfly)
 			CONTROL.E = 0
 		end
 	end)
-	FLY()
+
+	FLY()   
 end
-function NOFLY()
+function stopFly()
 	FLYING = false
 	if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
-	if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-		Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+	if LPlayer.Character:FindFirstChildOfClass('Humanoid') then
+		LPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
 	end
 	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
 end
+function getMayor()
+    for i,v in pairs(Players:GetChildren()) do
+        if v == game:GetService("ReplicatedStorage").CurrentMayor.Value and game:GetService("ReplicatedStorage").CurrentMayor.Value ~= nil then
+            return v
+        end
+    end
+end
+
 local xdisplay = {}
 function xdisplay:addItemDisplay(player)
 	if player.Character.UpperTorso:FindFirstChild("ItemDisplay") then		
 		player.Character.UpperTorso["ItemDisplay"]:Destroy()		
-	end
-	print("Added display to " .. player.Name)
+	end	
 	local ItemDisplay = Instance.new("BillboardGui")	
 	local UIGridLayout = Instance.new("UIGridLayout")
 
@@ -558,8 +571,8 @@ local function refreshDisplay(plr)
         end
     end     
 end
+
 bypass()
-print("Loading | 15%")
 
 ASection1:addToggle("Toggle Hitboxes", nil, function(v)
     Hitboxes = v
@@ -567,9 +580,8 @@ end)
 ASection1:addSlider("Hitbox Size", 1, 0, 55, function(v)
     headHitboxSize = v
 end)
-ASection2:addToggle("Infinite Shotgun Ammo", nil, function(x)   
-    shotgunMod2 = x    
-    bypass()
+ASection1:addSlider("Hitbox Transparency", hitboxTransparency, 0, 1, function(v)
+    hitboxTransparency = v
 end)
 ASection2:addToggle("Ghost Shotgun", nil, function(x)   
     shotgunMod1 = x    
@@ -605,9 +617,18 @@ end)
 ASection22:addToggle("No Impacts", nil, function(x)   
     BDelete = x        
 end)
+ASection22:addToggle("Always headshot", nil, function(x)   
+    alwaysHeadShot = x        
+end)
 ASection22:addToggle("No visual recoil", nil, function(x)   
     Rmod = x
     bypass()
+end)
+ASection22:addToggle("Custom hit sound", nil, function(x)   
+    customHitSound = x
+end)
+ASection22:addDropdown("Hit sound", {"Skeet", "Rust", "COD", "Test"}, function(x)
+    customHitSoundType = x
 end)
 ASection22:addToggle("Gun Silencer", nil, function(x)   
     for i,v in pairs(LPlayer.Character:GetChildren()) do
@@ -732,11 +753,14 @@ end)
 PlrSection:addToggle("Speed Bypass - (Dont walk into sharp terrain)", nil, function(v)    
     speedBypass = v
 end)
-PlrSection:addToggle("Flight", nil, function(Fly_Switch)
-    if Fly_Switch then  
-        sFLY()
+
+local flying = false
+PlrSection:addKeybind("Flight KeyBind", nil, function()        
+    flying = not flying
+    if flying then
+        startFly()                    
     else
-    	NOFLY()
+    	stopFly()             
     end
 end)
 PlrSectionC:addToggle("Crafter + Paramedic Auto-heal", nil, function(v)
@@ -766,6 +790,13 @@ end)
 
 plrApp:addToggle("Outfit Editer", nil, function(v)
     LPlayer.PlayerGui.AvatarEditor.Enabled = v
+    LPlayer.PlayerGui.AvatarEditor.WearButton.Visible = not v
+end)
+plrApp:addTextbox("Custom Cloth", "Default", function(value, focusLost)
+    game:GetService("ReplicatedStorage")["_CS.Events"].EquipAvatarItem:FireServer("CustomCloth",value)
+    if focusLost then
+        game:GetService("ReplicatedStorage")["_CS.Events"].EquipAvatarItem:FireServer("CustomCloth",value)
+    end
 end)
 plrApp:addDropdown("Presets", {"Black", "Glitch", "Black & White", "Hacker"}, function(t)
     if t == "Black" then
@@ -859,16 +890,18 @@ end)
 plrAppFE:addButton("Remove Face" ,function()   
     LPlayer.Character.Head.face:Destroy()
 end)
+
 local teamSniperValue = ""
-local teamSniperEnabled = false
 teamSection:addDropdown("Team Changer", {"Gunsmith", "Civilian", "Crafter", "Advanced Gunsmith", "Trucker", "Tow Trucker", "Secret Service", "Advanced Car Dealer", "Car Dealer","Deliverant", "Criminal", "Crafter", "Cab Driver", "Paramedic", "Mayor", "Military", "SWAT", "Sheriff"}, function(team)
     game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").TeamChanger:FireServer(team)
 end)
 teamSection:addDropdown("Team Snipe Value", {"Gunsmith", "Civilian", "Crafter", "Advanced Gunsmith", "Trucker", "Tow Trucker", "Secret Service", "Advanced Car Dealer", "Car Dealer","Deliverant", "Criminal", "Crafter", "Cab Driver", "Paramedic", "Mayor", "Military", "SWAT", "Sheriff"}, function(team)
     teamSniperValue = team
 end)
-teamSection:addToggle("Team Sniper", nil, function(v)
-    teamSniperEnabled = v
+teamSection:addToggle("Team Sniper", false, function(v)    
+    repeat wait(1)
+        game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").TeamChanger:FireServer(teamSniperValue)            
+    until not v
 end)
 print("Loading | 25%")
 -- ESP Page
@@ -908,6 +941,9 @@ end)
 EspSection1:addToggle("ESP status level", nil, function(state)
     esp_WantedLevel = state
 end)
+EspSection1:addToggle("Tool ESP", nil, function(state)
+    esp_tools = state
+end)
 EspSection1:addColorPicker("ESP Main Color", Color3.fromRGB(255, 255, 255), function(s)
     esp_Main_Colour = s
 end)
@@ -933,7 +969,6 @@ end)
 wrldSection:addColorPicker("Ambient", Color3.fromRGB(150, 140, 140), function(s)    
     wLighting.Ambient = s    
 end)
-
 MiscEsp:addButton("Printer ESP", function()
     for i,v in pairs(game:GetService("Workspace").Entities:GetChildren()) do
         if v:IsA("Model") and v.Name == "Simple Printer" then
@@ -945,21 +980,6 @@ MiscEsp:addButton("Printer ESP", function()
             a.ZIndex = 0
             a.Transparency = 0.3
             a.Color = BrickColor.new("Lime green")
-        end
-    end
-end)
-
-MiscEsp:addButton("Gun ESP", function()
-    for i,v in pairs(game:GetService("Workspace").Entities:GetChildren()) do
-        if v:IsA("Model") and v.Name == "ToolModel" then
-            local a = Instance.new("BoxHandleAdornment")
-            a.Name = v.Name:lower().."_alwayswinAV"
-            a.Parent = v.hitbox
-            a.Adornee = v
-            a.AlwaysOnTop = true
-            a.ZIndex = 0
-            a.Transparency = 0.3
-            a.Color = BrickColor.new("Really red")
         end
     end
 end)
@@ -1025,6 +1045,10 @@ specificSection:addButton("TP cars to target", function()
         end
     end
 end)
+
+PlrTarget:addButton("View Mayor", function()
+    game.Workspace.Camera.CameraSubject = getMayor().Character.Humanoid
+end)
 PlrTarget:addButton("View Next Player", function()
     if plrNum < #game.Players:GetPlayers() then
         plrNum = plrNum + 1
@@ -1080,7 +1104,7 @@ DonateSection:addButton("Donate to Players", function()
 end)
 PlrTarget:addButton("Arrest Player", function()
     for i,v in pairs(game:service'Players':GetPlayers()) do
-        if v.Name:match(targetName) and v.Name ~= "US3RNAME_1ACC" then
+        if v.Name:match(targetName) and not table.find(DevList, v.Name) then
             if v.Character.Wanted.Value == 0 then  
                 notify(v.Name .. ": Is not wanted")  
             else                            
@@ -1101,20 +1125,15 @@ OtherSection0:addToggle("Arrest all", nil, function(state)
     autoArrest = state
 end)
 
-local currentVehicle;
-coroutine.wrap(function()
-    while wait(.8) do
-        if LPlayer.Character.Humanoid.SeatPart ~= nil then
-            currentVehicle = LPlayer.Character.Humanoid.SeatPart.Parent
-        else 
-            currentVehicle = nil
-        end
-    end
-end)()
+function getCurrentVehicle()   
+    if LPlayer.Character.Humanoid.SeatPart ~= nil then
+        return LPlayer.Character.Humanoid.SeatPart.Parent        
+    end   
+end
 teleSection1:addKeybind("Click TP Keybind", nil, function()
     if mouse.Target then 
-        if currentVehicle ~= nil then
-            currentVehicle:SetPrimaryPartCFrame(CFrame.new(mouse.Hit.x, mouse.Hit.y + 5, mouse.Hit.z) * CFrame.new(0,-2,0))
+        if getCurrentVehicle() ~= nil then
+            getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(mouse.Hit.x, mouse.Hit.y + 5, mouse.Hit.z) * CFrame.new(0,-2,0))
         else 
         LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(mouse.Hit.x, mouse.Hit.y + 5, mouse.Hit.z)      
         end
@@ -1122,70 +1141,68 @@ teleSection1:addKeybind("Click TP Keybind", nil, function()
 end)
 --< teleportation
 teleSection2:addButton("Arway", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(1861.14111, -65.5734253, -1310.6853, 0.998740196, 0, -0.0501802117, 0, 1, 0, 0.0501802117, 0, 0.998740196) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(1861.14111, -65.5734253, -1310.6853, 0.998740196, 0, -0.0501802117, 0, 1, 0, 0.0501802117, 0, 0.998740196) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1861.14111, -65.5734253, -1310.6853, 0.998740196, 0, -0.0501802117, 0, 1, 0, 0.0501802117, 0, 0.998740196)end end)
 teleSection2:addButton("Pahrump", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(-73.3169708, 9.45411873, 40.8025475, 0.0519082919, 0, -0.998651743, 0, 1, 0, 0.998651743, 0, 0.0519082919) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(-73.3169708, 9.45411873, 40.8025475, 0.0519082919, 0, -0.998651743, 0, 1, 0, 0.998651743, 0, 0.0519082919) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-73.3169708, 9.45411873, 40.8025475, 0.0519082919, 0, -0.998651743, 0, 1, 0, 0.998651743, 0, 0.0519082919)end end)
 teleSection2:addButton("Eastdike", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(3044.31445, -4.52655077, -3741.91479, -0.939210117, -1.1611624e-07, -0.343343019, -1.19063124e-07, 1, -1.24975301e-08, 0.343343019, 2.91416864e-08, -0.939210117) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(3044.31445, -4.52655077, -3741.91479, -0.939210117, -1.1611624e-07, -0.343343019, -1.19063124e-07, 1, -1.24975301e-08, 0.343343019, 2.91416864e-08, -0.939210117) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(3044.31445, -4.52655077, -3741.91479, -0.939210117, -1.1611624e-07, -0.343343019, -1.19063124e-07, 1, -1.24975301e-08, 0.343343019, 2.91416864e-08, -0.939210117)end end)
 teleSection2:addButton("Eaphis Plateau", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(1751.93347, 77.9265747, 556.575073, 0.99836874, 0, 0.0570888072, 0, 1, 0, -0.0570888072, 0, 0.99836874) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(1751.93347, 77.9265747, 556.575073, 0.99836874, 0, 0.0570888072, 0, 1, 0, -0.0570888072, 0, 0.99836874) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1751.93347, 77.9265747, 556.575073, 0.99836874, 0, 0.0570888072, 0, 1, 0, -0.0570888072, 0, 0.99836874)end end)
 teleSection2:addButton("Okby Steppe", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(3894.29224, -2.04217577, -3309.31274, 0.819154441, 5.08817486e-08, 0.573573053, -8.20474284e-08, 1, 2.84667561e-08, -0.573573053, -7.03788601e-08, 0.819154441, -7.03788601e-08, 0.819154441) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(3894.29224, -2.04217577, -3309.31274, 0.819154441, 5.08817486e-08, 0.573573053, -8.20474284e-08, 1, 2.84667561e-08, -0.573573053, -7.03788601e-08, 0.819154441, -7.03788601e-08, 0.819154441) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(3894.29224, -2.04217577, -3309.31274, 0.819154441, 5.08817486e-08, 0.573573053, -8.20474284e-08, 1, 2.84667561e-08, -0.573573053, -7.03788601e-08, 0.819154441)end end)
-
 teleSection2:addButton("Hospital", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(1620.60095, -65.4234238, -1399.48181, -0.0176989716, 0, -0.99984318, 0, 1, 0, 0.99984318, 0, -0.0176989716) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(1620.60095, -65.4234238, -1399.48181, -0.0176989716, 0, -0.99984318, 0, 1, 0, 0.99984318, 0, -0.0176989716) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1620.60095, -65.4234238, -1399.48181, -0.0176989716, 0, -0.99984318, 0, 1, 0, 0.99984318, 0, -0.0176989716)end end)
-
 teleSection2:addButton("Police Station", function()
-if currentVehicle ~= nil then
-currentVehicle:SetPrimaryPartCFrame(CFrame.new(3894.29224, -2.04217577, -3309.31274, 0.819154441, 5.08817486e-08, 0.573573053, -8.20474284e-08, 1, 2.84667561e-08, -0.573573053, -7.03788601e-08, 0.819154441) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(1613.32397, -62.9234428, -1272.24634, 0.999857605, -3.98448172e-08, 0.0168763287, 4.06155785e-08, 1, -4.53283135e-08, -0.0168763287, 4.60073011e-08, 0.999857605) * CFrame.new(0,5,0))
 else 
-LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(3894.29224, -2.04217577, -3309.31274, 0.819154441, 5.08817486e-08, 0.573573053, -8.20474284e-08, 1, 2.84667561e-08, -0.573573053, -7.03788601e-08, 0.819154441)end end)
+LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1613.32397, -62.9234428, -1272.24634, 0.999857605, -3.98448172e-08, 0.0168763287, 4.06155785e-08, 1, -4.53283135e-08, -0.0168763287, 4.60073011e-08, 0.999857605)end end)
 teleSection2:addButton("Depository", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(2051.33301, -67.4034195, -1436.65967, 0.989166439, 0, 0.146798298, 0, 1, 0, -0.146798298, 0, 0.989166439) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(2051.33301, -67.4034195, -1436.65967, 0.989166439, 0, 0.146798298, 0, 1, 0, -0.146798298, 0, 0.989166439) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(2051.33301, -67.4034195, -1436.65967, 0.989166439, 0, 0.146798298, 0, 1, 0, -0.146798298, 0, 0.989166439)end end)
 teleSection2:addButton("Airfield", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(1884.29016, -21.3613071, -36.481102, -0.659217179, 1.00295431e-07, -0.751953006, 6.3527267e-08, 0.99999994, 7.7687254e-08, 0.751953006, 3.44318352e-09, -0.659217179) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(1884.29016, -21.3613071, -36.481102, -0.659217179, 1.00295431e-07, -0.751953006, 6.3527267e-08, 0.99999994, 7.7687254e-08, 0.751953006, 3.44318352e-09, -0.659217179) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1884.29016, -21.3613071, -36.481102, -0.659217179, 1.00295431e-07, -0.751953006, 6.3527267e-08, 0.99999994, 7.7687254e-08, 0.751953006, 3.44318352e-09, -0.659217179)end end)
 teleSection3:addButton("Safe Spot 1", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(2122.71143, -83.3322983, -1404.4574, -0.701904893, -3.58332279e-08, 0.712271094, -3.54125085e-08, 1, 1.54112971e-08, -0.712271094, -1.4406039e-08, -0.701904893) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(2122.71143, -83.3322983, -1404.4574, -0.701904893, -3.58332279e-08, 0.712271094, -3.54125085e-08, 1, 1.54112971e-08, -0.712271094, -1.4406039e-08, -0.701904893) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(2122.71143, -83.3322983, -1404.4574, -0.701904893, -3.58332279e-08, 0.712271094, -3.54125085e-08, 1, 1.54112971e-08, -0.712271094, -1.4406039e-08, -0.701904893)end end)
 teleSection3:addButton("Safe Spot 2", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(2945.89185, -137.832367, -631.946899, -0.0719730258, -0.0382576138, 0.996672332, -5.91074745e-08, 0.999264121, 0.0383570902, -0.997406602, 0.00276061334, -0.0719199777) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(2945.89185, -137.832367, -631.946899, -0.0719730258, -0.0382576138, 0.996672332, -5.91074745e-08, 0.999264121, 0.0383570902, -0.997406602, 0.00276061334, -0.0719199777) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(2945.89185, -137.832367, -631.946899, -0.0719730258, -0.0382576138, 0.996672332, -5.91074745e-08, 0.999264121, 0.0383570902, -0.997406602, 0.00276061334, -0.0719199777)end end)
 teleSection3:addButton("Safe Spot 3", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(1370.47009, 71.7390747, 1057.67322, -0.805606365, 3.60798893e-08, -0.592451155, 9.24334884e-08, 1, -6.47903775e-08, 0.592451155, -1.06957877e-07, -0.805606365) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(1370.47009, 71.7390747, 1057.67322, -0.805606365, 3.60798893e-08, -0.592451155, 9.24334884e-08, 1, -6.47903775e-08, 0.592451155, -1.06957877e-07, -0.805606365) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1370.47009, 71.7390747, 1057.67322, -0.805606365, 3.60798893e-08, -0.592451155, 9.24334884e-08, 1, -6.47903775e-08, 0.592451155, -1.06957877e-07, -0.805606365)end end)
 teleSection4:addButton("Player lobby", function()
-if currentVehicle ~= nil then
-    currentVehicle:SetPrimaryPartCFrame(CFrame.new(451.888794, -8.47341156, -1337.15466, -0.0644594803, 5.36564535e-08, -0.997920215, 3.67105028e-13, 1, 5.37682183e-08, 0.997920215, 3.46550766e-09, -0.0644594803) * CFrame.new(0,5,0))
+if getCurrentVehicle() ~= nil then
+    getCurrentVehicle():SetPrimaryPartCFrame(CFrame.new(451.888794, -8.47341156, -1337.15466, -0.0644594803, 5.36564535e-08, -0.997920215, 3.67105028e-13, 1, 5.37682183e-08, 0.997920215, 3.46550766e-09, -0.0644594803) * CFrame.new(0,5,0))
 else 
 LPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(451.888794, -8.47341156, -1337.15466, -0.0644594803, 5.36564535e-08, -0.997920215, 3.67105028e-13, 1, 5.37682183e-08, 0.997920215, 3.46550766e-09, -0.0644594803)end end)
 
@@ -1210,23 +1227,46 @@ end)
 
 local buyAmmoAmount = 1
 local ammoType = ""
-BuySectionAmmo:addDropdown("Ammo", {"9mm", "5.56", "12 Gauge", ".50", ".45 ACP", "5.7x28"}, function(valuex)
+AutoBuySection:addDropdown("Ammo", {"9mm", "5.56", "12 Gauge", ".50", ".45 ACP", "5.7x28"}, function(valuex)
     ammoType = valuex
 end)
-BuySectionAmmo:addSlider("Ammo Amount", 1, 0, 200, function(v)
+AutoBuySection:addSlider("Ammo Amount", 1, 0, 200, function(v)
     buyAmmoAmount = v
 end)
-BuySectionAmmo:addButton("Buy ammo", function()
+AutoBuySection:addButton("Buy ammo", function()
     for i = 1, buyAmmoAmount, 1 do
         wait(.3)   
         game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").PurchaseTeamItem:FireServer(ammoType,"Single",nil)
     end
 end)
+local isCrate = false
+local weaponType = nil  
+AutoBuySection:addButton("Buy Weapon", function()
+    if weaponType ~= nil then
+        if isCrate then
+            game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").PurchaseTeamItem:FireServer(weaponType,"Crate",nil)
+            game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").DeliveryFunction:FireServer("PickUpDelivery",weaponType)
+        else
+            game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").PurchaseTeamItem:FireServer(weaponType,"Single",nil)
+        end
+    end
+end)
+AutoBuySection:addDropdown("Weapon type (Gunsmith roles)", {"Sawed Off", "Micro SMG", "Light Vest", "9mm", "AR", "PDW .45", "Heavy Pistol", "Service Rifle", "Skorpion", "Tactical SMG", "Shotgun", "Bullpup Shotgun", "Handgun", "Revolver", "Snubnose", "Lockpick"}, function(t)
+    weaponType = t
+end)
+AutoBuySection:addToggle("Is Crate", nil, function(v)
+    isCrate = v
+end)
+
 local kitSpammerEnabled = false
 BuySectionMisc2:addToggle("Kit Spammer (Requires right role)", nil, function(state)
     kitSpammerEnabled = state
 end)
-function getTool(t,old)                  
+
+
+
+
+--[[function getTool(t,old)                  
     LPlayer.Character.HumanoidRootPart.CFrame = t.Handle.CFrame * CFrame.new(0,1,0)                  
     game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").Dropper:FireServer(t,"PickUp")                   
     wait()   
@@ -1243,23 +1283,18 @@ wepSection:addToggle("Tool Sniper", nil, function(state)
     if state then  
         local oldCFrame = LPlayer.Character.HumanoidRootPart.CFrame         
         for i,v in pairs(game:GetService("Workspace").Entities:GetChildren()) do            
-            if v.Name == "ToolModel" and not v:FindFirstChild("PlayerWhoDropped") then    
+            if v:IsA("Model") and v.Name == "ToolModel" and LPlayer.Character and v.Handle and not v:FindFirstChild("PlayerWhoDropped") then
                 getTool(v,oldCFrame)                                
             end
         end
     end    
 end)
-function getCurrentVehicle()   
-    if LPlayer.Character.Humanoid.SeatPart ~= nil then
-        return LPlayer.Character.Humanoid.SeatPart.Parent        
-    end   
-end
 wepSection:addToggle("Auto Store items", nil, function(state)
     autoStore = state
 end)
 wepSection:addToggle("Backpack Pass", nil, function(state)
    LPlayer.PlayerScripts.OwnsBackpackPass.Value = state
-end)
+end)]]
 miscSection:addButton("Rejoin", function()
     game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
 end)
@@ -1332,11 +1367,11 @@ CarSection:addButton("Bring all cars", function()
     end
 end)
 CarSection:addButton("Crash passengers", function() 
-    seat = game.Players.LocalPlayer.Character.Humanoid.SeatPart
+    local seat = game.Players.LocalPlayer.Character.Humanoid.SeatPart
     seat.Parent:MoveTo(Vector3.new(seat.Parent.PrimaryPart.Position.X, workspace.FallenPartsDestroyHeight+1, seat.Parent.PrimaryPart.Position.Z))
 end)
 CarSection:addButton("Skydive passengers", function() 
-    seat = game.Players.LocalPlayer.Character.Humanoid.SeatPart
+    local seat = game.Players.LocalPlayer.Character.Humanoid.SeatPart
     seat.Parent:MoveTo(Vector3.new(seat.Parent.PrimaryPart.Position.X, seat.Parent.PrimaryPart.Position.Y + 30000, seat.Parent.PrimaryPart.Position.Z))
 end)
 
@@ -1362,13 +1397,13 @@ boomSection:addButton("End of time", function()
 print("Loading | 30%")
 
 ThemeSection:addToggle("Theme Enabled", true, function(state)
-    _G.Enabled = state
-    if _G.Enabled then
+    ThemeEnabled = state
+    if ThemeEnabled then
         setTheme()
     end
 end)
 ThemeSection:addDropdown("Theme Mode", {"Purple", "Red", "Green", "White"}, function(valuex)
-    _G.ThemeMode = valuex
+    ThemeMode = valuex
     setTheme()
 end)
 UISection:addKeybind("GUI Keybind", Enum.KeyCode.LeftAlt, function()    
@@ -1443,20 +1478,11 @@ coroutine.wrap(function()
     end
 end)()
 coroutine.wrap(function()
-    while wait(1) do
-        if teamSniperEnabled then   
-            pcall(function()        
-                game:GetService("ReplicatedStorage"):FindFirstChild("_CS.Events").TeamChanger:FireServer(teamSniperValue)            
-            end)
-        end 
-    end
-end)()
-coroutine.wrap(function()
     while wait(3) do
         if autoArrest then    
             pcall(function()                      
                 for i,v in ipairs(Players:GetChildren()) do
-                    if v.Character.Wanted.Value ~= 1 and v.Name ~= "US3RNAME_1ACC" then 
+                    if v.Character.Wanted.Value ~= 1 and not table.find(DevList, v.Name) then 
                         wait(.1)                        
                         LPlayer.Character.HumanoidRootPart.Anchored = true 
                         LPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,2) 
@@ -1512,7 +1538,7 @@ coroutine.wrap(function()
                     for i,v in pairs(game.Players:GetPlayers()) do
                     if v ~= LPlayer and v.Character and v.Character:FindFirstChild('Head') then
                         v.Character.Head.Size = Vector3.new(headHitboxSize,headHitboxSize,headHitboxSize)
-                        v.Character.Head.Transparency = 0.7
+                        v.Character.Head.Transparency = hitboxTransparency
                         v.Character.Head.CanCollide = false
                         if v.Character.Humanoid.Health == 0 then
                             v.Character.Head.Size = LPlayer.Character.Head.Size
@@ -1539,7 +1565,7 @@ UIS.InputBegan:connect(function(UserInput)
         Action(LPlayer.Character.Humanoid, function(self)
             if self:GetState() == Enum.HumanoidStateType.Jumping or self:GetState() == Enum.HumanoidStateType.Freefall then
                 Action(self.Parent.HumanoidRootPart, function(self)
-                    self.Velocity = Vector3.new(0, _G.JumpHeight, 0);
+                    self.Velocity = Vector3.new(0, lJumpHeight, 0);
                 end)
             end
         end)
@@ -1552,7 +1578,7 @@ UIS.InputBegan:connect(function(process)
             Action(LPlayer.Character.Humanoid, function(self)
                 if self:GetState() == Enum.HumanoidStateType.Jumping or self:GetState() == Enum.HumanoidStateType.Freefall then
                     Action(self.Parent.HumanoidRootPart, function(self)
-                        self.Velocity = Vector3.new(0, _G.JumpHeight, 0);
+                        self.Velocity = Vector3.new(0, lJumpHeight, 0);
                     end)
                 end
             end)            
@@ -1560,7 +1586,8 @@ UIS.InputBegan:connect(function(process)
         end
     end
 end)
---@@@@@
+
+
 local MouseDown = false
 UIS.InputBegan:Connect(function(a)
     if a.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -1583,7 +1610,6 @@ spawn(function()
         end
     end
 end)
---@@@@@@@@@
 UIS.InputBegan:Connect(function(a)
     if a.UserInputType == Enum.UserInputType.MouseButton1 and shotMulti then
         for i,v in pairs(LPlayer.Character:GetChildren()) do
@@ -1595,15 +1621,17 @@ UIS.InputBegan:Connect(function(a)
         end 
     end
 end)
+
 print("Loading | 50%")
+
 game:GetService("RunService").RenderStepped:connect(function()       
    if esp_Enabled then       
         for _,v in pairs(Players:GetChildren()) do
             if v.Character and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("Humanoid").Health > 0 and v ~= LPlayer then
             local part = v.Character.HumanoidRootPart             
             local distance = LPlayer:DistanceFromCharacter(v.Character.HumanoidRootPart.Position)
-            local Vec ,b=game.Workspace.CurrentCamera:WorldToViewportPoint(part.Position)
-                if b then
+            local Vec ,onscreen =game.Workspace.CurrentCamera:WorldToViewportPoint(part.Position)
+                if onscreen then
                     if esp_Names and distance < maxDisance and distance > 7 then
                         local a=Drawing.new("Text")
                         if esp_distance then                
@@ -1808,27 +1836,139 @@ game:GetService("RunService").RenderStepped:connect(function()
             end
         end
     end
-end)    
-print("Loading | 70%")
-		
-wait(.5)
+    if esp_tools then        
+        for i,v in pairs(game:GetService("Workspace").Entities:GetChildren()) do
+            if v:IsA("Model") and v.Name == "ToolModel" and LPlayer.Character and v.Handle and not v:FindFirstChild("PlayerWhoDropped") then
+                local Handle = v.Handle
+                local name = Handle.ToolBG.ToolName.Value
+                local dist = (LPlayer.Character.HumanoidRootPart.Position-Handle.Position).Magnitude
+                local vec, onscreen = game.Workspace.CurrentCamera:WorldToViewportPoint(Handle.Position)
+                if onscreen then
+                    local toolTag = Drawing.new("Text")
+                    toolTag.Text = name.." | "..math.round(dist)
+                    toolTag.Outline = true
+                    toolTag.Color = Color3.fromRGB(255, 222, 0)
+                    toolTag.OutlineColor = Color3.fromRGB(0,0,0)
+                    toolTag.Visible = true
+                    toolTag.Font = Drawing.Fonts.UI
+                    toolTag.Transparency = 1
+                    toolTag.Position = Vector2.new(vec.X,vec.Y)
+                    coroutine.wrap(function()
+                        game.RunService.RenderStepped:Wait()
+                        toolTag:Remove()
+                    end)()
+                 end
+            end
+        end
+    end    
+end)
+
 notify("Anomic V", "Scripts made by H3LLL0 and Krypton - Forum name: F A Z E D")
-wait(.3)
 notify("Anomic V", "Info can be found in discord")
+
 wait(.3)
+
 bypass()
 setTheme()
+
 LPlayer.CharacterAdded:Connect(function()
-    if _G.Enabled then
+    if ThemeEnabled then
         wait(1)    
         setTheme()
     end
-end)
-print("Loading | 80%")
-game.Players.LocalPlayer.CharacterAdded:Connect(function()
     wait(2)
     bypass()
 end)
-Main:SelectPage(Main.pages[1], true)
 
+local function ApplyDev(v)
+    local s,e = pcall(function()
+        v.Head.PlayerDisplay.Wanted.Text = "Exploit Dev"
+        if v.Name == "BonfireHubWhen" or v.Name == "Tempo_Tantrum" then
+            v.Head.PlayerDisplay.Wanted.TextColor3 = Color3.fromRGB(185, 92, 0)
+            v.Head.PlayerDisplay.PlayerName.Text = "Bonfire"
+        else
+            v.Head.PlayerDisplay.Wanted.TextColor3 = Color3.fromRGB(209, 37, 10)
+            if v.Name == "US3RNAME_1ACC" then
+                v.Head.PlayerDisplay.PlayerName.Text = "H4"
+            end
+        end
+    end)
+end
+
+local function DevCheck(v)
+    if table.find(DevList, v.Name) then
+        ApplyDev(v)
+
+        --epic "error handling" lmao
+        v:WaitForChild("Head"):WaitForChild("PlayerDisplay"):WaitForChild("Wanted"):GetPropertyChangedSignal("Text"):Connect(function()
+            ApplyDev(v)
+        end)
+        v:WaitForChild("Head"):WaitForChild("PlayerDisplay"):WaitForChild("Wanted"):GetPropertyChangedSignal("TextColor3"):Connect(function()
+            ApplyDev(v)
+        end)
+    end
+end
+
+for i,v in pairs (game.Players:GetPlayers()) do
+    if v.Character then
+        DevCheck(v.Character)
+    end
+    v.CharacterAdded:Connect(function(char)
+        task.wait(1)
+        DevCheck(char)
+    end)
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(char)
+        task.wait(1)
+        DevCheck(char)
+    end)
+end)
+
+--will add popup soon
+
+local function HitSound()
+    local sound = Instance.new("Sound",workspace)
+    if customHitSoundType == "Skeet" then
+        sound.SoundId = "rbxassetid://5447626464"
+    elseif customHitSoundType == "Rust" then
+        sound.SoundId = "rbxassetid://5043539486"
+    elseif customHitSoundType == "COD" then
+        sound.SoundId = "rbxassetid://5952120301" 
+    elseif customHitSoundType == "Test" then
+        sound.SoundId = "rbxassetid://4836574859"
+    end
+    sound.Looped = false
+    sound.Volume = 2
+    sound:Play()
+end
+
+local mt = getrawmetatable(game)
+setreadonly(mt, false)
+local namecall = mt.__namecall
+
+mt.__namecall = function(self,...)
+    local args = {...}
+    local method = getnamecallmethod()
+
+    if customHitSound or alwaysHeadShot then
+        if tostring(self) == "WeaponServer" and tostring(method) == "FireServer" then       
+            if tostring(args[1]) == "Player" then  
+                if customHitSoundType then
+                    HitSound()
+                end
+                if alwaysHeadShot then
+                    local player = args[2].Parent            
+                    args[4] = player.Head           
+                end 
+            end
+            return self.FireServer(self, unpack(args))        
+        end
+    end
+
+	return namecall(self,...)
+end
+
+Main:SelectPage(Main.pages[1], true)
 print("Loading | 100%")
